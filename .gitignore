@@ -1,0 +1,13 @@
+*.db
+repos_mirror
+.DS_Store
+test/
+*.csv
+
+*.zip
+venv
+__pycache__
+.csv
+advisory-db-osv
+downloads*
+diff*
