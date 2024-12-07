@@ -1,0 +1,990 @@
+cve_id,hash,repo_url,msg,merge,parents,num_files,num_lines_added,num_lines_deleted
+GHSA-qc36-q22q-cjw3,8bfc20506cc5e098fe6eb3d1cafe3bea791215ce,https://github.com/lettre/lettre,"fix(transport-smtp): Fix transparency codec - 0.9.x (#628)
+
+Co-authored-by: Paolo Barbolini <paolo@paolo565.org>",0,d930c42d5069e344a9dfa84ebe4b60bf3b11ac64,1,11,2
+GHSA-r626-fc64-3q28,34c2b9e,https://github.com/SonicFrog/abox,send/sync fix to prevent misuse,0,5abe75222bc49af6b62ea37f87d7be0c56973310,1,2,2
+GHSA-88xq-w8cq-xfg7,886ecc562040bef61faf19438c22285c2d62403a,https://github.com/bytecodealliance/wasmtime,"Merge pull request from GHSA-88xq-w8cq-xfg7
+
+This commit fixes the drop of an uninitialized `VMExternRef` for an `externref`
+global in an instance that failed to be allocated by the pooling instance
+allocator.
+
+The following engine configuration (via `Config`) is required to be impacted by
+this bug:
+
+* support for the reference types proposal must be enabled (this is the
+  default for `Config`).
+* a pooling allocation strategy must be configured via
+  `Config::allocation_strategy`, which is not the default allocation strategy.
+
+A module must be instantiated with the following characteristics:
+
+* The module defines at least one table or memory.
+* The module defines at least one `externref` global.
+
+During instantiation, one of the following must occur to cause the
+instantiation to fail:
+
+* a call to `mprotect` or `VirtualAlloc` fails (e.g. out-of-memory conditions).
+* a resource limiter was configured in the associated Store (via `Store::limiter`
+  or `Store::limiter_async`) and the limiter returns false from the initial call
+  to grow_memory or grow_table.
+
+This results in a partially-initialized instance being dropped and that attempts
+to drop the uninitialized `VMExternRef` representing the defined `externref` global.
+
+The fix is to track whether or not the `VMContext` of the instance has been fully
+initialized and skip the dropping of globals if not.",0,39b88e4e9e8115e4a9da2c1e3423459edf0a648e,3,74,1
+GHSA-2wc6-2rcj-8v76,24c7a5550807ac8a09648b5878f19d14c3a69135,https://github.com/sodiumoxide/sodiumoxide,Check the return value of `scalarmult()`. Closes #154,0,12d49e8ed1b53821465f24312695376eb86c89d2,1,55,46
+GHSA-q3cc-7p7g-392c,ac30e169ae51b262bc8cf7026469851ce39b23c6,https://github.com/rusqlite/rusqlite,Use SmallCString in most places,0,552416039ec700471167c22f32e07d7d2126cea1,3,16,12
+GHSA-m296-j53x-xv95,7ab8a264980d23c2ed64e72f4636f38b7381eb39,https://github.com/KizzyCode/tiny_future,Require `Send` for underlying types to fix https://github.com/KizzyCode/tiny_future/issues/1,0,c7919199a0f6d1ce0e3c33499d1b37f862c990e4,1,2,2
+GHSA-m296-j53x-xv95,c7919199a0f6d1ce0e3c33499d1b37f862c990e4,https://github.com/KizzyCode/tiny_future,Require `Send` for underlying types to fix https://github.com/KizzyCode/tiny_future/issues/1,0,50bd80f874c851413a721bbe144eeba4dfb68b4e,1,1,1
+GHSA-8h4j-vm3r-vcq3,2ef3628dac35aeba0a97d5fb3a57746b4e1d62b3,https://github.com/rusqlite/rusqlite,Actually fix auxdata api...,0,71b2f5187b0cbace3f8b6ff53432ff2ca0defcf0,1,54,65
+GHSA-p24j-h477-76q3,bf2b2df9c9e218e35e5a38ce3d03cffb7c363956,https://github.com/sharkdp/bat,"Fix for Windows: do not run binaries from CWD
+
+This fixes a bug on Windows where `Command::new` would also run
+executables from the current working directory, possibly resulting in
+accidental runs of programs called `less`.",0,3617c98cf5de9996c29fe73bc7fc4126768497f3,2,41,2
+GHSA-f6g6-54hm-fhxv,a34d6e1,https://github.com/mvertescher/libsbc-rs,"Add R: Send bound to Send impl of Decoder<R>
+fixes issue #4",0,7278b23901f93d956d9739fdfc4ced147cc3f242,1,1,1
+GHSA-686f-ch3r-xwmh,92f40b4a2c671553dfa96feacff0265206c44ce5,https://github.com/udoprog/unicycle,Make Send + Sync bounds conditional (fixes #8),0,f5a283826ef91e5a07f4b43fea9ec8ae281f84cb,2,4,4
+GHSA-hf79-8hjp-rrvq,7c7757c772fb709c61b1442bcc1e1fbee97bf4a8,https://github.com/bytecodealliance/lucet,"Merge pull request from GHSA-hf79-8hjp-rrvq
+
+* Use manual drop
+
+* Add some comments to `ManuallyDrop` usage
+
+* rustfmt
+
+Co-authored-by: Aaron Turon <aturon@fastly.com>
+Co-authored-by: Alex Crichton <alex@alexcrichton.com>",0,8fb1fece339927e178f6cfef4eb67328b500237d,1,26,13
+GHSA-fqq2-xp7m-xvm8,b0d2bd20eb40b9cbc2958b981ba2dcd9e6f9396e,https://github.com/RusPiRo/ruspiro-singleton,fix soundness,0,0565f8ef459bd336eda8a6a63d1d50cdb581c2b3,1,4,2
+GHSA-rmff-f8w9-c9rm,0a1da873ddb29bca926bad8301f8d7ab8aa97c52,https://github.com/edarc/max7301,"Fix unsoundness in ImmediateIO and TransactionalIO, aka RUSTSEC-2020-0152 aka
+edarc/max7301#1.
+
+Unsafe impls of Sync for both of these structs are removed, and Send bounds are
+introduced where necessary to allow Sync to be properly deduced instead.
+
+The unsafe impls were introduced due to an incorrect analysis of why Sync was
+not being auto-deduced as expected for these structs. The removed comment
+explains the original flawed analysis, which attributed it to the presence of a
+struct member of type PhantomData<EI>, under the assumption that the only
+""real"" value of type EI in the struct is ultimately inside an IOMutex that
+should bless it with Sync-ness regardless if EI is itself Sync.
+
+In fact, Sync was not being deduced due to the absence of a *Send* bound on the
+type EI, which is required for Expander<EI> to be Send, which is required for
+IOMutex<Expander<EI>> to be *Sync*. The presence of the PhantomData<EI> member
+turns out to be entirely irrelevant.
+
+The bug could theoretically result in a data race if either type is used with
+an EI that is not safe to send between threads.
+
+This is a breaking change due to the addition of a trait bound in the public
+API.",0,fb11c86f9bc2c45c0bc3fd14b5780c9c47f6320e,5,32,52
+GHSA-hpcx-3pw8-g3j2,2820cf12f2e08645fd6d1f15b4a90a54d6082a81,https://github.com/Yoric/telemetry.rs,"Resolves #45 - Fix security vulnerability, get rid of every unsafe code.",0,5c810a8345be7d763ab1c4a716683188e36aceb4,3,6,40
+GHSA-g4w7-3qr8-5623,71b2f5187b0cbace3f8b6ff53432ff2ca0defcf0,https://github.com/rusqlite/rusqlite,Ensure type use for auxdata is repr(C),0,38aea89809ea4154975d853bffe3cb7715fe84d6,1,16,6
+GHSA-v4cp-h94r-m7xf,d2ce1ac753afc059e32798bac3383b81a6d04456,https://github.com/bytecodealliance/wasmtime,"Fix a use-after-free bug when passing `ExternRef`s to Wasm
+
+We _must not_ trigger a GC when moving refs from host code into
+Wasm (e.g. returned from a host function or passed as arguments to a Wasm
+function). After insertion into the table, this reference is no longer
+rooted. If multiple references are being sent from the host into Wasm and we
+allowed GCs during insertion, then the following events could happen:
+
+* Reference A is inserted into the activations table. This does not trigger a
+  GC, but does fill the table to capacity.
+
+* The caller's reference to A is removed. Now the only reference to A is from
+  the activations table.
+
+* Reference B is inserted into the activations table. Because the table is at
+  capacity, a GC is triggered.
+
+* A is reclaimed because the only reference keeping it alive was the activation
+  table's reference (it isn't inside any Wasm frames on the stack yet, so stack
+  scanning and stack maps don't increment its reference count).
+
+* We transfer control to Wasm, giving it A and B. Wasm uses A. That's a use
+  after free.
+
+To prevent uses after free, we cannot GC when moving refs into the
+`VMExternRefActivationsTable` because we are passing them from the host to Wasm.
+
+On the other hand, when we are *cloning* -- as opposed to moving -- refs from
+the host to Wasm, then it is fine to GC while inserting into the activations
+table, because the original referent that we are cloning from is still alive and
+rooting the ref.",0,4b256ab9682a5ae5e364137e9de1feefe040ee35,14,665,106
+GHSA-7cqg-8449-rmfv,11ba23a9766a5079918cd9f515bc100bc8164b50,https://github.com/paritytech/libsecp256k1,Prevent side channel leak in Scala::check_overflow,0,91d4b499d625d4a24f68f1317acc4e96d4ac2904,2,23,17
+GHSA-773q-5334-5gf9,19ade85,https://github.com/rust-blockchain/evm,Skip setting memory value if the value vec is empty,0,2a8a3e967ec265fdc7120ff6b57ceab021ca69f6,1,4,0
+GHSA-8mjx-h23h-w2pg,2a4d53809e3000f40085f2b229b6b1a33759881d,https://github.com/thepowersgang/stack_dst-rs,Avoid double-drops when `clone` panics in slice push. Fixes #5,0,807e9d45019c02369e11d40bd181cbf7bb7981fc,2,55,11
+GHSA-m9m5-cg5h-r582,5ba218ac29df4786b002d7d12b47fa0c04a331f2,https://github.com/Absolucy/nanorand-rs,fix: Fix random number generation,0,7bf49ecbb254991585c04dd4f4d2a23cb16a1240,1,7,7
+RUSTSEC-2019-0038,7fd282aef7787577c385aed88cb25d004b85f494,https://github.com/jnqnfe/pulse-binding-rust,"use `catch_unwind` with callbacks
+
+Per Rust documentation, it is undefined behaviour to panic into foreign
+code, thus a panic-catcher is needed at the boundary point where PA calls
+into our Rust binding, which only happens with callback execution. This is
+exactly the sort of thing that `std::panic::catch_unwind` is meant for.",0,c1e20e87c6a6f975b48b959cfafec24fd2eae14f,14,252,175
+GHSA-5xg3-j2j6-rcx4,f01846bd443aaf92fdd5ac20f461beac3f6ee3fd,https://github.com/dandavison/delta,"Do not resolve executables as relative path from current directory (#658)
+
+* Refactor: child pager process creation
+
+* Protect calls to Command::new behind grep_cli::resolve_binary
+
+* Move less env-var setting into less-specific branch",0,2826bdd75b31f42aac1c80b2302c25e739a8adf1,3,161,66
+RUSTSEC-2018-0004,8f28ec275e412dd3af4f3cda460605512faf332c,https://github.com/ruuda/claxon,"Fix bug in decoding residuals
+
+A partition order could occur, such that the block size was not a
+multiple of 2^order. Computation of the number of samples per partition
+did not account for this case, rounding down due to the bit shift. This
+meant that we would not fill the entire decode buffer.
+
+Claxon does not zero the decode buffer because it is (should be)
+overwritten anyway, and in the case of a format error, where the buffer
+might be only partially full, the buffer is not exposed again.
+Furthermore, the way decoding works in most places, is that we fill the
+entire buffer, just by looping to fill it. If the input bitstream does
+not contain enough data to fill the buffer, then that's a format error.
+In a few places though, we need to slice up the buffer before decoding
+into it: for decoding individual channels, and also for decoding
+residuals, which are split into partitions.
+
+This particular format error was especially nasty because it did not
+cause a format error down the line. Instead, it caused the buffer to be
+sliced in a way where the slices together did not cover the entire
+buffer, and so parts of uninitialized memory could remain in the buffer.
+
+Thanks a lot to Sergey ""Shnatsel"" Davidoff for reporting this bug,
+together with elaborate steps to reproduce that allowed me to pinpoint
+the cause quickly.",0,cd82be35f413940ba446d2a19f10d74b86466487,1,19,6
+GHSA-28ph-f7gx-fqj8,3c6b57fe1b2cc87e7ebecde43dd836ffb1c4ea5c,https://github.com/rusqlite/rusqlite,Fix vtab::Module lifetime,0,e85963852d0320c50686ecf70dbca124c600de4a,5,87,90
+RUSTSEC-2020-0161,01940637dd8f3bfeeee3faf9639fa9ae52f19f4d,https://gitlab.com/KonradBorowski/array-macro,"Always call methods on references in a macro
+
+The macro scope cannot be trusted to not contain trait implementations
+which try to break this crate. To avoid this, explicitly reference
+variables on which methods are called.",0,eb1d8121dd2083898798937c84a16f9125b81baf,2,16,3
+GHSA-w3g5-2848-2v8r,f7d120a3b724d06a7b623d0a4306acf8f78cb4f0,https://github.com/Xudong-Huang/generator-rs,:pencil: fix send issue (#27),0,96885a9eb1d81d7de2eaa24dda824c1904230ece,5,85,41
+GHSA-8928-2fgm-6x9x,e965d8298f421e9c89fe98b1300b8361e948c324,https://github.com/actix/actix-web,HRS security fixes (#2363),0,f6e69919ede4872c1d987b4b932c44580190971c,4,562,330
+GHSA-hw4v-5x4h-c3xm,0b962f218f0cdd796dadfe26c3f09e68f7861b26,https://github.com/paritytech/frontier,Add transaction cost pre-validation (#465),0,4b6c80808209d5ea7a2d3225b572214667a27cd2,1,42,0
+GHSA-gwc9-348x-qwv2,666c2554ea0e1728c35aa41178cf235920db888a,https://github.com/bytecodealliance/wasmtime,"Merge pull request from GHSA-gwc9-348x-qwv2
+
+* Run the GC smoketest with epoch support enabled as well.
+
+* Handle safepoints in cold blocks properly.
+
+Currently, the way that we find safepoint slots for a given instruction
+relies on the instruction index order in the safepoint list matching the
+order of instruction emission.
+
+Previous to the introduction of cold-block support, this was trivially
+satisfied by sorting the safepoint list: we emit instructions 0, 1, 2,
+3, 4, ..., and so if we have safepoints at instructions 1 and 4, we will
+encounter them in that order.
+
+However, cold blocks are supported by swizzling the emission order at
+the last moment (to avoid having to renumber instructions partway
+through the compilation pipeline), so we actually emit instructions out
+of index order when cold blocks are present.
+
+Reference-type support in Wasm in particular uses cold blocks for
+slowpaths, and has live refs and safepoints in these slowpaths, so we
+can reliably ""skip"" a safepoint (not emit any metadata for it) in the
+presence of reftype usage.
+
+This PR fixes the emission code by building a map from instruction index
+to safepoint index first, then doing lookups through this map, rather
+than following along in-order as it emits instructions.",0,353f1b48ab73aab92e014b214a7770cbbf99c2ab,4,46,15
+GHSA-45w7-7g63-2m5w,2a4d538,https://github.com/thepowersgang/stack_dst-rs,Avoid double-drops when `clone` panics in slice push. Fixes #5,0,807e9d45019c02369e11d40bd181cbf7bb7981fc,2,55,11
+GHSA-8r7q-r9mx-35rh,2327d3b774927fdf48903c0bdc1ca7ec93c7c8d0,https://github.com/rusqlite/rusqlite,Fix format string error in rusqlite::trace::log,0,abbab7216a8b47108a0e1b7a26e429d6a990d7a6,1,1,1
+GHSA-6hfq-h8hq-87mf,8f93123efef5c1361086688fe4f34c83c89cec02,https://github.com/hyperium/hyper,"fix(http1): fix server misinterpretting multiple Transfer-Encoding headers
+
+When a request arrived with multiple `Transfer-Encoding` headers, hyper
+would check each if they ended with `chunked`. It should have only
+checked if the *last* header ended with `chunked`.
+
+See https://github.com/hyperium/hyper/security/advisories/GHSA-6hfq-h8hq-87mf",0,4d2125c67c8087de863f74278a017c4caf37e6a9,1,12,0
+GHSA-67hm-27mx-9cg7,d44011a69e0674acfa9c59bd7ad7f0523eb61d42,https://github.com/denoland/deno,fix(runtime): require full read and write permissions to create symlinks (#12554),0,b7341438f29de88f3458b32a835bfad560bda52e,1,34,4
+GHSA-mc22-5q92-8v85,1a2efcdbe68e5e7fd0a05836ac32d2cde78a0b2e,https://github.com/tremor-rs/tremor-runtime,"Remove patch and merge in_place optimizations.
+
+They are too dangerous and can lead to memory unsafety.
+
+Also added proper state handling to script based tests.
+
+Signed-off-by: Matthias Wahl <mwahl@wayfair.com>",0,bffc2a555bc4922bbb36b7186445477d8c0d0193,7,40,152
+GHSA-m5pq-gvj9-9vr8,ae70b41d4f46641dbc45c7a4f87954aea356283e,https://github.com/rust-lang/regex,"security: fix denial-of-service bug in compiler
+
+The regex compiler will happily attempt to compile '(?:){294967295}' by
+compiling the empty sub-expression 294,967,295 times. Empty
+sub-expressions don't use any memory in the current implementation, so
+this doesn't trigger the pre-existing machinery for stopping compilation
+early if the regex object gets too big. The end result is that while
+compilation will eventually succeed, it takes a very long time to do so.
+
+In this commit, we fix this problem by adding a fake amount of memory
+every time we compile an empty sub-expression. It turns out we were
+already tracking an additional amount of indirect heap usage via
+'extra_inst_bytes' in the compiler, so we just make it look like
+compiling an empty sub-expression actually adds an additional 'Inst' to
+the compiled regex object.
+
+This has the effect of causing the regex compiler to reject this sort of
+regex in a reasonable amount of time by default.
+
+Many thanks to @VTCAKAVSMoACE for reporting this, providing the valuable
+test cases and continuing to test this patch as it was developed.
+
+Fixes https://github.com/rust-lang/regex/security/advisories/GHSA-m5pq-gvj9-9vr8",0,b92ffd5471018419ec48dbdef32757424439f065,2,95,2
+GHSA-3cgf-9m6x-pwwr,45fd77ee43c38eea4d6f4e2e56c1667a55ec654f,https://github.com/rusqlite/rusqlite,UnlockNotification should hold mutex when calling condvar,0,c9ef5bd63cad5c0c123344c072b490a1a9bcbe1f,1,9,11
+GHSA-9qmm-4mfr-r3wj,e61e045f8c244de978401d186dcfd50838817297,https://github.com/solana-labs/rbpf,jit: sign-extend the quotient register on sdiv32 (#310),0,792fb1ebc074919c001c7db757d094229371eff1,2,32,1
+GHSA-h6xw-mghq-7523,b4e6dc76f4845ab03104187a42ac6d1bbc1e0021,https://github.com/waycrate/swhkd,[patch] CVE-2022-27819,0,4a4d76df3b3df1bd0bc132694e2985770a95e464,1,34,21
+GHSA-862g-9h5m-m3qv,2a36405339c87b16ed6c76e91ad5b76638fbdb0c,https://github.com/coreos/coreos-installer,"install: restrict access permissions on /boot/ignition{,/config.ign}
+
+The Ignition config may contain secrets.  Don't expose it, or anything in
+its parent directory, to unprivileged processes.
+
+https://github.com/coreos/fedora-coreos-tracker/issues/889",0,1239f0cb60efb398c0cd545a81877c26f9f83897,1,26,3
+GHSA-p4jg-pccf-h82c,e661a4940df78fbb7b52c622ac4ae6a3a7f7d8aa,https://github.com/waycrate/swhkd,[patch] CVE-2022-27815,0,0b620a09605afb815c6d8d8953bbb7a10a8c0575,1,6,2
+GHSA-6q5w-m3c5-rv95,c9ef5bd63cad5c0c123344c072b490a1a9bcbe1f,https://github.com/rusqlite/rusqlite,Make VTab / VTabCursor `unsafe trait` as implmenting them on the wrong type is unsound,0,3c6b57fe1b2cc87e7ebecde43dd836ffb1c4ea5c,4,13,9
+GHSA-3227-r97m-8j95,da7904c04f82e1cb43cc42eaf6a1dba072b5c921,https://github.com/Basicprogrammer10/afire,🎗 Fix Path Traversal Exploit,0,5644d94eec95abe9323d99e307851a52957777d5,1,10,2
+GHSA-8m49-2xj8-67v9,0b620a09605afb815c6d8d8953bbb7a10a8c0575,https://github.com/waycrate/swhkd,[patch] CVE-2022-27816,0,f70b99dd575fab79d8a942111a6980431f006818,1,1,1
+GHSA-cjg2-2fjg-fph4,8a93fdc6c9f4eb1d2f2a11b7ff1d12d70bf5a664,https://github.com/paritytech/frontier,"Handle 0 exponent with fudged length correctly in ModExp (#549)
+
+* Handle 0 exponent with fudged length correctly in ModExp
+
+* cargo fmt
+
+* Revert to following EIP-2565 strictly, subtract after adding terms to prevent underflow
+
+* Update frame/evm/precompile/modexp/src/lib.rs
+
+Clean up test case
+
+Co-authored-by: Wei Tang <accounts@that.world>
+
+* More revert
+
+* cargo fmt
+
+* Prefer expect to match
+
+Co-authored-by: Wei Tang <accounts@that.world>",0,6dd07a4d581a4c00bb2a2238a81997fc75bc2127,1,51,5
+GHSA-r3r5-jhw6-4634,f70b99dd575fab79d8a942111a6980431f006818,https://github.com/waycrate/swhkd,[patch] CVE-2022-27818,0,b4e6dc76f4845ab03104187a42ac6d1bbc1e0021,2,7,9
+GHSA-5rrv-m36h-qwf8,9e9f1fb44114078c000c78c72e691eeb9e7ac260,https://github.com/sagebind/isahc,fix #2,0,298bf062a27339dd3411c932e5ac2e91a497e43a,1,16,1
+RUSTSEC-2020-0078,49b43f277afb1caf5104fcbe02bef581f7444686,https://github.com/deprecrated/net2-rs,"Do not assume memory layout of std::net::SocketAddr
+
+Fixes #105
+
+Reviewed by: Thomas de Zeeuw <thomasdezeeuw@gmail.com>",0,77a6eb4d5eb36adc81ee21ab7ffebc62fdf2ab88,2,124,10
+GHSA-62jx-8vmh-4mcw,d90a02f582c03dfa0fd11c78d608d0974625ae5d,https://github.com/alexcrichton/tar-rs,"Don't create directories before we've verified they're inside the tar destination (#259)
+
+Fixes #238
+
+Co-authored-by: Robert O'Callahan <robert@ocallahan.org>",0,860858be1ef65b3640c27ed752ea080995f86a64,3,57,6
+RUSTSEC-2020-0042,369e55736f9bd29c37b1712afc2923f4028148c6,https://github.com/arcnmx/stack-rs,"Add bounds check to Vector::insert
+
+Fixes #4",0,76cc1855a3ce966182bcf6fb2dc6a1d765cb5138,1,2,1
+GHSA-8q2v-67v7-6vc6,b8f9011c04f104bb4a20f44e5bce31a1e9b46e64,https://github.com/SergioBenitez/Rocket,"Fix 'LocalRequest::clone()' soundness issue.
+
+The existing implementation of 'LocalRequest::clone()' mistakenly copied
+the internal 'Request' pointer from the existing 'LocalRequest' to the
+cloned 'LocalRequest'. This resulted in an aliased '*mut Request'
+pointer, a clear soundness issue. The fix in this commit is to clone the
+internal 'Request', replacing the internal pointer with the newly cloned
+'Request' when producing the cloned 'LocalRequest'. A fix that removes
+all 'unsafe' code should be explored.
+
+Fixes #1312.",0,ca4d1572d408fd8dd13db103926ad96da878126d,2,53,4
+GHSA-3jc5-5hc5-33gj,268301a714934dd067ba33f59f22c5f003aa20f3,https://github.com/oliver-giersch/conquer-once,further restricts `Send` for `OnceCell` (fixes #3),0,06db899114401235392321af8225b55e2290e1f6,1,1,1
+RUSTSEC-2021-0044,e325e2fce4d9f9f392761e9fb58b418a48cef8bb,https://github.com/SergioBenitez/Rocket,"Fix soundness issue: make 'Formatter' panic-safe.
+
+Fixes #1534.",0,c24f15c18f02319be83af4f3c1951dc220b52c5e,1,86,19
+GHSA-4hjg-cx88-g9f9,8783a08e71694b7a5eb4fbc7cd95379b6de0d290,https://github.com/Matthias247/futures-intrusive,Add a Sync bound for GenericMutexGuard. Fixes #53. (#54),0,9ee6993ec7619f87dbbf0c995c19ef24b26586e6,1,7,0
+RUSTSEC-2021-0073,59f2a7311dd6540696bfd0145f5281ce495f4385,https://github.com/tokio-rs/prost,"Fix #438: Check for overflow in `Duration` and `Timestamp` processing (#439)
+
+* Check for overflow in `{Duration,Timestamp}::normalize`.
+
+* Check for overflow when converting `Timestamp` to `SystemTime`.
+
+Whether or not such an overflow is possible depends on the platform. It does not appear possible on `x86_64-unknown-linux-gnu` (which represents time with a 64-bit signed integer for seconds, same as `Timestamp`), but it is possible on `i686-unknown-linux-gnu` (which represents time with a 32-bit signed integer for seconds) and `x86_64-pc-windows-msvc` (which has a different representation of time altogether).
+
+* Add documentation for `TimestampOutOfSystemRangeError`.
+
+* Apply rustfmt.
+
+Co-authored-by: Lucio Franco <luciofranco14@gmail.com>",0,0833d467bd55ee7ff427e0484fc299366ad9ab7d,1,264,16
+RUSTSEC-2021-0003,85593a484173c574027d7897b980f729bb1f454f,https://github.com/servo/rust-smallvec,"Fix potential buffer overflow in `insert_many`
+
+Fixes #252.",0,0b2b4e53a5cf86740b2515907dd53252b3b59401,2,26,1
+GHSA-3qm2-rfqw-fmrw,18abedadaa77646cce6f2ca2149c0119a2e4f428,https://github.com/okready/scratchpad,"Fix double drop during panic unwinds
+
+The `SliceMoveSource` and `SliceMoveSourceCollection` trait
+implementations for arrays and boxed slices do not do anything to
+inhibit the dropping of elements in the source array or box until after
+all elements have been ""consumed"" by the provided closure. Under normal
+""happy path"" operation, this doesn't pose any issues, but if an
+unwinding panic occurs during closure execution, the element currently
+being consumed and all previous elements in the source array or box will
+be dropped even though ownership should have already been moved out of
+the source.
+
+For array-based sources, this commit addresses the issue by using an
+internal consuming iterator that inhibits dropping for elements that
+have already been consumed while dropping elements that have not been
+consumed if the iterator is dropped before being exhausted (as could
+occur during panic unwinds). For boxed slice sources, the boxed slice is
+simply converted to a `Vec`, and the default iterator conversion for
+`Vec`s (which is already unwind-safe) is used.
+
+Fixes #1.",0,0cc776fb47e5339259675eca5548dc524aa7c550,4,304,30
+GHSA-wp34-mqw5-jj85,6b83f9d0708337a9f8b709c1624a8587021ceba2,https://github.com/bennetthardwick/nano-arena,"Fix #1, add tests",0,f5306c73a0f8f260eb49f9f0a8509ef85f038244,1,55,2
+RUSTSEC-2020-0091,dfeb84bfce2be11327749c152b3c8f4ea4304e12,https://github.com/vorner/arc-swap,"Fix soundness hole around access::Map
+
+The assumption that the address of access's guarded reference stays the
+same is not true.
+
+Costs:
+* The Map is now slower and adds an allocation.
+* It can stop being Copy (but non-trivial guards weren't anyway) and
+  it can stop being Sync/Send if the closure is not.
+* The taken closure needs to be Clone.
+
+Fixes #45.
+
+Technically, it is a breaking change, but the plan is not to raise major
+version, because:
+
+* Even rust std gives exception to break compatibility for soundness
+  hole fixes.
+* It is not that likely people's code would break.
+* Even if it breaks, they are much more likely to go to the fixed
+  version then if the version got bumped and that's what they should be
+  doing ASAP due to the potential UB.",0,b5ec44cd5d9b4b4a491cf85c1cbb2b1d5cdae061,2,20,37
+GHSA-r57r-j98g-587f,340f893dbc9db3e43c6315b05eff4b0b150220d2,https://github.com/Absolucy/nanorand-rs,fix: Fix aliased mutable references with `TlsWyRand` (fixes #28),0,8e282f2f413d7cac73adf6a20c31bc4d5800cb8b,1,15,20
+RUSTSEC-2021-0019,1660818b60832fdf58b982a37d81f5ef10abe0be,https://github.com/rust-x-bindings/rust-xcb,"string returned from X can be invalid utf-8 (#108)
+
+fixes #96",0,121acde839901c33cde938a527f50993838dee89,1,53,9
+RUSTSEC-2021-0014,6299af0ab17f070a78b75367e14b9101c29ce475,https://github.com/blackbeam/rust-marc,Remove unsafe code (fix #7),0,e626775a6998e1f97c8c1a242362602924e1693f,1,1,2
+RUSTSEC-2020-0008,0867ad5c15fa52b7af3fc840ee7a1e256c469942,https://github.com/hyperium/hyper,"fix(client): allow client GET requests with explicit body headers
+
+Closes #1925",0,ac45f1ac4508454f4e6b2ce26c1235dfdb169230,2,221,45
+GHSA-39xg-8p43-h76x,6dd7ca0d50f2464df708975cdafcfaeeb6d41c66,https://github.com/diwic/reffers-rs,"Fix unsoundness in arefs/arefss::map/try_map
+
+Closes: #7
+
+Thanks to Youngsuk Kim (CS PhD student @ Georgia Tech)
+for discovering this issue!",0,34d987860eb84c9e7ddc9a87c289bd6a7029576d,1,5,5
+GHSA-v5r6-6r3c-wqxc,dbc7ab1c739667eb26aace1b9a6795192ed4a805,https://github.com/KizzyCode/asn1_der-rust,Fixed https://github.com/KizzyCode/asn1_der/issues/1 and added tests for this case,0,2e781a3e7de7e687ce5d7774bde963057abff4ae,2,7,8
+GHSA-r7rv-2rph-hvhj,3199bd8623d05341b4047f53e143ae67d7d9f064,https://github.com/buttplugio/buttplug,"chore: Add trait bounds for ButtplugFutureStateShared Sync/Send
+
+Make sure that the Sync/Send impls for ButtplugFutureStateShared
+require that the type we are holding also implement Send/Sync.
+
+Fixes #225",0,c7bf7eb3223b9cd6743b5db901e271a856054c89,1,2,2
+RUSTSEC-2021-0036,2928a87a0c9f86c46ba70f8c8058d9b7b10a241d,https://github.com/droundy/internment,restrict Sync/Send for Intern<T> (closes #20),0,863dbc0653cb8b265b3b969d94b4bdaa50fd4a03,1,2,2
+GHSA-m7w4-8wp8-m2xq,8e970aaa60471a845a309c0fe82ebe59779341ca,https://github.com/maciejhirsz/beef,"Require Sync to implement Send for Cow. Fixes #37 (#38)
+
+* Require Sync to implement Send for Cow. Fixes #37
+
+Currently it is possible to send across references to non-sync types across thread boundaries as long as they are wrapped in a Cow. This changes the trait bounds for `Send` to be the same as they are for the standard library's Cow https://doc.rust-lang.org/std/borrow/enum.Cow.html#impl-Send
+
+* `Send` should always require `Send`
+
+Co-authored-by: Maciej Hirsz <1096222+maciejhirsz@users.noreply.github.com>",0,0b4685143e680749991c295836d8d09565fd6814,1,2,1
+RUSTSEC-2021-0112,cdff034e6d93cdfdafd13d8c6956e22fa5a57b79,https://github.com/tectonic-typesetting/tectonic,"xdv: fix a potential source of undefined behavior
+
+Fixes #752.",0,c86ad4140a7b59c4f5a1db2f0adbb966285e75cd,1,3,4
+RUSTSEC-2021-0016,599313b39c249ee89144c69eb09da0f56d579922,https://github.com/andrewhickman/ms3d,"Fix passing uninit buffer to user-provided Read implementation
+
+Fixes #1",0,d583d52f0143f833ee31f6adfe0d7ba06a2b5d6b,1,3,6
+RUSTSEC-2020-0040,291fca7dbfb2e3fe235180b41ce9e845ef0b2895,https://github.com/petertodd/rust-obstack,"Fix padding calculation
+
+Fixes https://github.com/petertodd/rust-obstack/issues/4
+
+Was basically calculating the bytes after the *previous* alignment
+boundry, rather than the padding required to get to the *next* alignment
+boundry. Which was covered up by another bug where the padding wasn't
+converted to units.
+
+Also didn't account for the fact that the alignment might be larger than
+the chunk size.",0,79d95ca1f548bee9a5cb19249afc35a034f8f90a,1,2,7
+GHSA-jf5h-cf95-w759,936ab41a87d2b4876e09efc43864faf591dc0c2c,https://github.com/gz/rust-cpuid,"Replac uses of from_utf8_unchecked with from_utf8.
+
+Fixes #43.",0,0ebd1da97b50e10c3672681c9508bab5692f10e3,1,12,20
+GHSA-g4xg-fxmg-vcg5,229d1a8d41b0023420e7815578fa0b39c0d5c2e4,https://github.com/BurntSushi/ripgrep,"cli: fix arbitrary execution of program bug
+
+This fixes a bug only present on Windows that would permit someone to
+execute an arbitrary program if they crafted an appropriate directory
+tree. Namely, if someone put an executable named 'xz.exe' in the root of
+a directory tree and one ran 'rg -z foo' from the root of that tree,
+then the 'xz.exe' executable in that tree would execute if there are any
+'xz' files anywhere in the tree.
+
+The root cause of this problem is that 'CreateProcess' on Windows will
+implicitly look in the current working directory for an executable when
+it is given a relative path to a program. Rust's standard library allows
+this behavior to occur, so we work around it here. We work around it by
+explicitly resolving programs like 'xz' via 'PATH'. That way, we only
+ever pass an absolute path to 'CreateProcess', which avoids the implicit
+behavior of checking the current working directory.
+
+This fix doesn't apply to non-Windows systems as it is believed to only
+impact Windows. In theory, the bug could apply on Unix if '.' is in
+one's PATH, but at that point, you reap what you sow.
+
+While the extent to which this is a security problem isn't clear, I
+think users generally expect to be able to download or clone
+repositories from the Internet and run ripgrep on them without fear of
+anything too awful happening. Being able to execute an arbitrary program
+probably violates that expectation. Therefore, CVE-2021-3013[1] was
+created for this issue.
+
+We apply the same logic to the --pre command, since the --pre command is
+likely in a user's config file and it would be surprising for something
+that the user is searching to modify which preprocessor command is used.
+
+The --pre and -z/--search-zip flags are the only two ways that ripgrep
+will invoke external programs, so this should cover any possible
+exploitable cases of this bug.
+
+[1] - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-3013",0,8ec6ef373f1845b5f9d9f341e8709cf86de057b8,4,148,28
+GHSA-h7qh-3h6f-w79p,26a296b871976d7d46325ce004207b8a6e27c94,https://github.com/multiformats/rust-multihash,"fix: make sure Multihashes are always valid
+
+When a Multihash is created, we make sure that the supplied code is supported,
+hence part of the code table. Throw an error if a passed in multihash contains
+an unsupported code.
+
+Fixes #70.",0,5072807be78c1f9da46a3d957671dcea9dab87af,2,11,1
+GHSA-69fv-gw6g-8ccg,e7e291709240bd83ca35a12b85d87f074002be7,https://github.com/arrayfire/arrayfire-rust,Fix Rust enum representation to match C ABI,0,ad518a7afe68f2b4f38234e400f040dddd463d90,12,165,165
+GHSA-p56p-gq3f-whg8,1b643df85ca4a56f7d96105a9eb35e1b917ee48,https://github.com/sunrise-choir/flumedb-rs,Ensure buffer is zeroed for reading,0,65084ddde9a0bf407de314183c74b75d45da98e3,2,3,5
+GHSA-4vhw-4rw7-jfpv,dd0639bf2876773b66382f47285f7db701f628d,https://github.com/NilsIrl/MozWire,"Validate server hostnames to prevent path traversal
+
+If Mozilla servers were compromised, hostnames could be used for path
+traversal attacks. The impact would be very low as it would only be
+possible to write wireguard configs.
+
+Fix #14",0,1e58d8ba41268b36232e6830808565850ec65587,1,23,2
+GHSA-rwf4-gx62-rqfw,f9e8a1c13cca73e356b48f8a16a6bd308f20988,https://github.com/crossbeam-rs/crossbeam,"Fixes ordering bug in ms queue
+
+`Signal.ready` is being used to guard access to the data slot. This
+requires using acquire / release ordering vs. relaxed.
+
+I believe that the original code was written with the assumption that
+`thread::park() / unpark()` was able to provide the necessary ordering,
+but this is not true given that park() can spuriously wakeup, which
+means that there is a chance (although, a small one) for the memory to
+not be in a consistent state.
+
+Fixes #97",0,a4ec61cb04e75fdc3e63958b6a9a90fc3d8bde88,1,2,2
+RUSTSEC-2020-0074,f86e6d392326f0e4dc25eeec8b26af36f2b0fbc,https://github.com/PyO3/pyo3,py: fix reference count bug in From(Py<T>) for PyObject,0,6669493502ca93e5b902e6534e00a78c20b46796,1,12,2
+GHSA-39wr-f4ff-xm6p,45f172cf8407e05cb9ed431f68663ad4f46b232,https://github.com/RustCrypto/hashes,Fix an overflow in Streebog causing panic or incorrect output,0,7f3080be055b2feef44c408870654619eb14524f,1,3,5
+GHSA-vc2p-r46x-m3vx,bbe7cc5381c5380b54fb8bbb4f77a3725917ff0,https://github.com/lettre/lettre,fix(transport-sendmail): Stop argument parsing before destination addresses,0,b187885e70af400d50e3200390306b9bd2109675,1,3,0
+GHSA-vc2p-r46x-m3vx,414bc9e7abac7500312e0324378ec320c079a98,https://github.com/lettre/lettre,fix(transport-sendmail): Only pass -f option to sendmail when needed,0,bbe7cc5381c5380b54fb8bbb4f77a3725917ff0b,1,15,12
+RUSTSEC-2021-0005,76bc9b5fbae73262307c41e72dbcfa0796073f3,https://github.com/rustgd/glsl-layout,panic safety fix: guard against double drop,0,119f5ec524dca42403db2aa07569baa349793e9b,1,7,9
+RUSTSEC-2020-0019,ee5d1cf3b2df709ae1521d11521f38e335c45be,https://github.com/tokio-rs/tls,"Fix place wrong for process_new_packets
+
+The `wants_read` only changes after `process_new_packets`,
+which means that not immediately calling `process_new_packets` may cause rustls to cache too much data.",0,3c9b126993d406d510646b7e942389b38f31b8c4,1,6,7
+GHSA-gq4h-f254-7cw9,a986a9335d591fa5c826157d1674d47aa525357,https://github.com/kvark/ticketed_lock,'T: Send' to prevent misuse,0,6d85af9eb5d8bb7cf142de8e832ce3af7e47e306,1,2,2
+GHSA-3pp4-64mp-9cg9,1a2efcdbe68e5e7fd0a05836ac32d2cde78a0b2,https://github.com/tremor-rs/tremor-runtime,"Remove patch and merge in_place optimizations.
+
+They are too dangerous and can lead to memory unsafety.
+
+Also added proper state handling to script based tests.
+
+Signed-off-by: Matthias Wahl <mwahl@wayfair.com>",0,bffc2a555bc4922bbb36b7186445477d8c0d0193,7,40,152
+GHSA-3pp4-64mp-9cg9,3bbb69d25b9ca995a4c25838781f89c62f2ca92,https://github.com/tremor-rs/tremor-runtime,"Add proper state handling to 'tremor run'.
+
+So state is not reset to 'null' after every event but lasts the whole 'tremor run' session when running a tremor script.
+
+Signed-off-by: Matthias Wahl <mwahl@wayfair.com>",0,1a2efcdbe68e5e7fd0a05836ac32d2cde78a0b2e,1,7,7
+RUSTSEC-2021-0100,96ccccd55ddbff7f03a9d484f52d1080f40eae8,https://github.com/RustCrypto/hashes,fix the bug,0,747a1200094bd0d58f8555b87c5bf48481f8cc58,1,2,2
+GHSA-r93v-9p5q-vhpf,543687d6c85f39338a283d72614ea96a7fc8188,https://github.com/rust-lang/futures-rs,Fix UB due to missing 'static on task::waker,0,79679b3fd4e663181e413aae88493dc1b1b9ce61,1,1,1
+RUSTSEC-2018-0002,d3d14ad5c32922444f857382976c22f056e3cef,https://github.com/alexcrichton/tar-rs,Prevent writing through a symlink to arbitrary files,0,089056223b190638b541f06c15be7baf98b7e33d,2,46,2
+GHSA-vhfr-v4w9-45v8,cdc4276a7e3ec67185c2b66fcb7585ec8716de1,https://github.com/ebkalderon/renderdoc-rs,Switch multi-frame capture and file comments methods to &mut self,0,6a01ca45455d3e7d22f2d5cd985ee3155e883f98,1,2,2
+GHSA-wq8f-46ww-6c2h,85e98d1c9d5ba8af623120e8fee6c97a2c2aee0,https://github.com/briansmith/untrusted,Return error before incrementing Reader's index (self.i),0,44384f81a3318b13430f3976c769d4925ec9d76d,1,4,4
+GHSA-qj3v-q2vj-4c8h,fb1021a1c3c8a34d0eef7335811c52535e5c179,https://github.com/arkworks-rs/r1cs-std,proposal to fix mul_by_inverse,0,2b8e020aad1018f37c84b2821d7e2c40f76c4672,2,33,7
+GHSA-39vw-qp34-rmwf,b93aff6e904cffbbfd1f421b82f6dcc5ca19a4f,https://github.com/dtolnay/serde-yaml,Prevent too deep recursion,0,49e1e6f064c0c6cc138ed2a3c80e3024b23ba965,3,84,8
+RUSTSEC-2021-0069,93458d01fed0ec81c0e7b4e98e6f35961356fae,https://github.com/lettre/lettre,"fix(transport-smtp): Fix transparency codec
+
+It fails to add transparency when a period is preceded by two
+successive CRLF.",0,1d8249165cdda87611ea243023f7f4eb405e4112,1,11,2
+GHSA-8gj8-hv75-gp94,38d308785f84f7037e63c04c0de1cb20d1c8284,https://github.com/crossbeam-rs/crossbeam,channel: Fix unsoundness issue (ManuallyDrop to MaybeUninit),0,0e91b789483fbfa88207988e600c794f74499d12,1,13,7
+GHSA-8gj8-hv75-gp94,7b35a3d17f5c5ec53f70576d4ca0e18be8ed289,https://github.com/crossbeam-rs/crossbeam,SegQueue: Fix unsoundness issue (ManuallyDrop to MaybeUninit),0,38d308785f84f7037e63c04c0de1cb20d1c8284d,1,13,7
+GHSA-8gj8-hv75-gp94,68e8708c2dda24e4b3b1807f5f301ca2b8ffa35,https://github.com/crossbeam-rs/crossbeam,deque: Fix unsoundness issue (ManuallyDrop to MaybeUninit),0,7b35a3d17f5c5ec53f70576d4ca0e18be8ed289b,1,18,17
+GHSA-8gj8-hv75-gp94,e0fd465b9b7de8b60b0b588e264aca1fa92fbd1,https://github.com/crossbeam-rs/crossbeam,epoch: Fix fixme in deferred.rs (mem::uninitialized -> MaybeUninit),0,68e8708c2dda24e4b3b1807f5f301ca2b8ffa357,1,7,13
+GHSA-8gj8-hv75-gp94,f48c1c763a73467e2fde6158c0abc2faa162ae8,https://github.com/crossbeam-rs/crossbeam,epoch: fix unsoundness in sync/queue.rs (ManuallyDrop/uninitialized -> MaybeUninit),0,e0fd465b9b7de8b60b0b588e264aca1fa92fbd18,1,26,26
+GHSA-8gj8-hv75-gp94,6f3a3c17ea89fe16f55246cdfb64d684a52a529,https://github.com/crossbeam-rs/crossbeam,queue: fix unsoundness issue in array_queue (introduce MaybeUninit),0,f48c1c763a73467e2fde6158c0abc2faa162ae81,1,4,6
+GHSA-8gj8-hv75-gp94,71d2799afe690ef9d07bb77614c6bb164cb8e67,https://github.com/crossbeam-rs/crossbeam,channel: fix unsoundness issue in array flavor (introduce MaybeUninit),0,6f3a3c17ea89fe16f55246cdfb64d684a52a5292,1,4,4
+GHSA-8gj8-hv75-gp94,b5525b73a5955c5f39157f088b78b93e8943649,https://github.com/crossbeam-rs/crossbeam,Use maybe-uninit crate to bridge backwards compatibility issues with MaybeUninit,0,7de64fe01926724ad9910b52303e43a49f6e0131,10,33,7
+GHSA-8gj8-hv75-gp94,d78de60ea78c3aa0eeca66f42dda0154a7cc89fc,https://github.com/crossbeam-rs/crossbeam,queue: add missing drop_in_place for array_queue slot values,0,dce3e118f2778423113e6d6019dd05d88cf7e0e6,1,11,1
+GHSA-8gj8-hv75-gp94,dce3e118f2778423113e6d6019dd05d88cf7e0e6,https://github.com/crossbeam-rs/crossbeam,channel: add missing drop_in_place for array channel flavour's msgs,0,5362ad3effe644ec98a80b01e9d881cc0231fc2a,1,11,1
+GHSA-m2pf-hprp-3vqm,65d17446c4242da0f9e1ae84b9dbce5108a822f,https://github.com/image-rs/image,"Remove actual unsafety in hdr
+
+Third part of the effort of removing `unsafe` from the library, the hdr
+decoder actually required an interface change. Several other instances
+had been removed in earlier commits. The method would use `Vec::set_len`
+even though it did not have full control over the type parameter, as it
+was a public interface.
+
+Now simply requires the memory into which to emplace the result to be
+provided and allocated externally. This makes the callers responsible
+for correct optimization.
+
+Removes the optimization for the library internal structures; it is
+expected that the compiler picks up on the pattern well enough for it to
+not be the main bottleneck.
+
+Leaves the instances that are deprecated methods, they should enjoy some
+deprecation period afterall and are not inherently bad as they are
+correctly marked with `unsafe` themselves.
+
+Co-Authored-By: Andreas Molzer <andreas.molzer@gmx.de>",0,5c51a7be311677c53ebbb2f66f61e64714ab33c7,1,27,36
+GHSA-p2g9-94wh-65c2,6c7bf22907a75d1bbaed52e4f7dd9716f5e6f73,https://github.com/rust-ammonia/ammonia,"Fix a space bug in `clean_text`
+
+I mixed up FF with CR when reading an ASCII table. Bug reported via email.",0,bcdf2d862675a37f4cace6c5258bb09aac0b9f85,1,10,1
+GHSA-ppj3-7jw3-8vc4,4c00d6212aa5fa56d16cc8a1774ad908d10522b,https://github.com/Amanieu/parking_lot,"Fix bounds on Send and Sync impls for lock guards
+
+Fixes #258
+Fixes #259",0,ecfe20bf5b7f8b06c7a39afd53cee88a99ce07db,3,5,7
+RUSTSEC-2018-0013,a134e06d740f9d7c287f74c0af2cd0620677436,https://github.com/nabijaczleweli/safe-transmute-rs,"Fix vec-to-vec conversion primitives
+
+- wrong function parameter order!",0,c79ebfdb5858982af59a78df471c7cad7a78fd23,2,2,2
+GHSA-qrqq-9c63-xfrg,4218155363f893032362d083a0e7fe5c5b0865c,https://github.com/tower-rs/tower-http,fixed build_and_validate_path to exclude colon,0,c99dd0a42b5251c1a2efb4a253440933856988d6,1,1,1
+GHSA-qrqq-9c63-xfrg,4ee8515f969d55768d875ea0b32491037a52fa1,https://github.com/tower-rs/tower-http,Fix directory traversal using `Path::components`,0,4218155363f893032362d083a0e7fe5c5b0865c8,1,15,21
+GHSA-f67m-9j94-qv9j,877dc0a52adedd1daaabcfcb56d90d1da1da862,https://github.com/hyperium/hyper,first step of removing mem::uninitialized,0,d1d2f32a7358c1c7d489ebbb98f4cbfdca9bb573,1,27,11
+GHSA-f67m-9j94-qv9j,7500d7ddfd1c39a5fbfefd54b9014842d9862af,https://github.com/hyperium/hyper,Server::parse - use MaybeUninit,0,877dc0a52adedd1daaabcfcb56d90d1da1da862f,1,6,3
+GHSA-f67m-9j94-qv9j,e57b06f701462547dc5eceb032b0651501ee974,https://github.com/hyperium/hyper,Client::parse - use MaybeUninit,0,7500d7ddfd1c39a5fbfefd54b9014842d9862af4,1,5,4
+GHSA-f67m-9j94-qv9j,5cf0b14921d2d21b0317307441cd6e7c36fa0da,https://github.com/hyperium/hyper,uninit headers - apply changes from second approach,0,16e859b27cb7ee1bae0b1cfc8fcea9131649666c,1,6,4
+GHSA-f67m-9j94-qv9j,684f2fa76d44fa2b1b063ad0443a1b0d16dfad0e,https://github.com/hyperium/hyper,"fix(http1): apply header title case for consecutive dashes (#2613)
+
+Fix the header title-casing to work with consecutive
+dashes. Previously with two dashes in a row the first dash would
+uppercase the second dash which would then not count, so
+`weird--header` would be cased as `Weird--header` instead of
+`Weird--Header`.",0,73bff4e98c372ce04b006370c0b0d2af29ea8718,1,11,27
+GHSA-r43h-gmrm-h5c9,df65b33f8a9dbd06b95b0a6af7521f0d4723354,https://github.com/contain-rs/linked-hash-map,Fix mem::uninitialized UB warning,0,4485163fe6aa2567d77fa7ff1d372512ca02245e,1,1,1
+GHSA-66p5-j55p-32r9,a83ccecf515b5273e4dd0306c1b9f6dcb7daf96,https://github.com/servo/rust-smallvec,"Use MaybeUninit for storage of inline items.
+
+This includes two breaking changes, in addition to the fact that it will
+require a MSRV bump:
+
+1. The functions on the `Array` trait `ptr` and `ptr_mut` have been
+   removed. Because these took a `&self`/`&mut self` argument, there's
+   no way for us to call them when we only have a `MaybeUninit<A>`. Now,
+   we just use the memory of the object directly.
+
+   This limits the flexibility of custom implementations of `Array`,
+   (they can no longer return pointers to values other than themselves)
+   but I imagine this is very rare and was probably broken somehow to
+   begin with. Anybody who does this will get a compile error.
+
+2. `from_buf_and_len_unchecked` now takes a MaybeUninit<A>, so that
+   callers have the option of only partially initializing the array.",0,ae79432ad505d13974d56eec12f529f0234a6264,1,49,52
+RUSTSEC-2021-0023,390a7b1049fa5ba1d627feaef2a1629e0e7826b,https://github.com/rust-random/rand,"Fix assertions inside read_{u32,u64}_into
+
+Unless I'm mistaken the size multiplier was on the wrong side, making the assertions too permissive. This could have resulted in destination buffers not being fully populated.",0,6ecbe2626b2cc6110a25c97b1702b347574febc7,1,2,2
+GHSA-r67p-m7g9-gxw6,a6d7cdd2221ae5087fa354a100733b2cc4fd008,https://github.com/jblondin/csv-sniffer,"take care of uninitialized memory security advisory
+
+see https://github.com/jblondin/csv-sniffer/issues/1",0,821ee203bb8264c5eb12a127d6d7c712be4efecb,1,1,1
+RUSTSEC-2021-0074,4b8426b89b861d9bea20e126576b0febb9d1351,https://github.com/rust-ammonia/ammonia,"Fix namespace switching bugs
+
+Reported as security vulnerability via private email.",0,ae3fb569e1f0019a8a9793616d1944614d79e7a0,1,460,3
+GHSA-xwxc-j97j-84gf,582b6221887e92aeab1ac9008c75133974ed939,https://github.com/hyyking/rustracts,"Add `Sync` bound to Send impl of LockWeak<T>`
+
+It is possible to create data races by enclosing a
+non-Sync type data to `ParentArc` and by accessing the enclosed data
+from multiple threads via `ChildArc`.
+
+This PR fixes the issue by adding a Sync bound to the
+`Send` impl of `LockWeak<T>`.
+For a detailed explanation with a proof-of-concept,
+please refer to the corresponding PR description.
+
+Thank you for reviewing :)",0,c15541d7968aea40d06dadd5e2c5cb57b4d6d341,1,1,1
+RUSTSEC-2020-0052,be327d581e8434a2ba41b74affc915f42d8abfc,https://github.com/crossbeam-rs/crossbeam,"Use Box<[T]> instead of Vec<T> to initialize and drop ArrayQueue
+
+Previously, the queue buffer was initialized using Vec::with_capacity.
+Note the with_capacity does not guarantee that precise capacity;
+the actual layout of the allocated memory could have a greater size.
+
+The drop code assumed the buffer has a size
+equal to the queue's capacity. This is undefined
+behavior when the buffer actually has a greater size.
+
+Using Box<[T]> instead guarantees an exact capacity, resolving the UB.",0,81ab18efc7376f3277a6359fdc20d00b4bcf911c,2,17,9
+RUSTSEC-2020-0004,e1068fdd32f1b12edad05b579f6cd2bd638316e,https://github.com/bytecodealliance/lucet,"Fix incorrect globals/sigstack allocation layout
+
+Most of this patch is actually to fix up the tests that were erroneously succeeding because of this
+bug. The core of the fix is here in `mmap.rs`:
+
+```
+-        let sigstack = globals + host_page_size();
++        let sigstack = globals + region.limits.globals_size + host_page_size();
+```
+
+This was causing the signal stack to begin one page after the start of the globals section,
+regardless of how big the globals are. This mostly wasn't causing problems because the default
+globals size is a page, and we _were_ still adding in a page for the guard, meaning the segments
+didn't actually overlap with default `Limits`. However, the guard page for the signal stack was
+missing, and configurations with larger globals sizes could end up overlapping the signal stack,
+potentially allowing guests to observe residual signal stack values.
+
+The lack of a signal stack guard page was _also_ making it so that tests running in debug mode would
+succeed, even though the signal handler was overflowing its stack into the globals page. To make
+those tests pass with the correct memory layout, the signal stack size is now configurable and set
+higher by default on debug builds (`cfg(debug_assertions)`). On release mode, the stack use is fine
+as the problematic series of stack allocations get optimized into some straightforward copies, so we
+continue to use SIGSTKSZ as a default in that configuration.
+
+Finally, I discovered some linking errors with the tests on release mode due to overly-aggressive
+stripping, so I had to refactor a couple tests.",0,9fc93a4a4a99fe5aaed066ecc76867565543d124,8,117,83
+GHSA-jrcf-4jp8-m28v,813a329f11b4901f962d89fe340004bb32129ac,https://github.com/yoshuawuyts/miow,"Safely convert SocketAddr into raw SOCKADDR
+
+Do not rely on the memory layout of std::net::SocketAddrV*",0,38583a69e9f7c7fc9a50581251bc21658918bfe1,1,61,11
+GHSA-jrcf-4jp8-m28v,2783715269d56a0020160179c0f2ba883d12d87,https://github.com/yoshuawuyts/miow,"Safely convert SocketAddr into raw SOCKADDR
+
+Do not rely on the memory layout of std::net::SocketAddrV*",0,f6662ef11d1aac309aea5a6548c1a2d35c1de6e9,1,57,5
+GHSA-jrcf-4jp8-m28v,27b77cc870b922d305015841978b581ceb18e3b,https://github.com/yoshuawuyts/miow,Adapt to winapi 0.2,0,2783715269d56a0020160179c0f2ba883d12d874,1,10,26
+RUSTSEC-2020-0012,043d5f0e4200b9bafc083997cc7bbf2c1bef91d,https://github.com/dylni/os_str_bytes,"Avoid unsafe use of `char::from_u32_unchecked`.
+
+The way this function is being used is directly violating its
+safety clause. Just because the standard library does it internally,
+it does not mean that it safe do it in non-standard crates.
+
+That behavior is not documented and may change at any moment
+(which includes crashing or producing a different result).
+
+The current implementations of `encode_utf8` and `encode_utf16` have
+been copied from Rust's libcore, changing the parameter type from `char`
+to `u32`.",0,e75193e151f23d0d6b2b096b69a303041496e9ff,1,73,28
+RUSTSEC-2020-0012,fd4bd03686c476efcc9d758e234f0bdf1732e7d,https://github.com/dylni/os_str_bytes,Avoid subslice patterns.,0,043d5f0e4200b9bafc083997cc7bbf2c1bef91dd,1,15,15
+GHSA-838h-jqp6-cf2f,4dd2832d0e4bd0253ea77dd15bcd95ea171bfee,https://github.com/denoland/deno,fix(ext/ffi): enforce unstable check on ops,0,bb3387de17953ea1f0558f5f9863b0cd6c59d48c,2,246,5
+GHSA-g4vj-x7v9-h82m,9340c55139dc0baaa19df3c3a75c4e46836eda33,https://github.com/paritytech/libsecp256k1,Non-overflowing parse for signatures,0,12e3829d6cd2d6459c2c920d7cf222f3a930b955,1,28,3
+GHSA-whc7-5p35-4ww2,5d3207830790420468b1e4f88d6a607df9e3379,https://github.com/actix/actix-net,"Remove the unsound custom Cell and replace it with Rc<RefCell<T> - the way it was before the introduction of a custom cell.
+Heavily based on the patch by Wim Looman <wim@nemo157.com> https://gist.github.com/Nemo157/b495b84b5b2f3134d19ad71ba5002066",0,61176f64101e06ab90d14342af7e8e95ecf17450,6,43,98
+RUSTSEC-2022-0041,f7c378b26e273d237575154800f6c2bd3bf2005,https://github.com/crossbeam-rs/crossbeam,Fix unsoundness of AtomicCell<*64> arithmetics on 32-bit targets that support Atomic*64,0,be6ff29e1fce196519b65cb0b647f1ad72659498,1,90,10
+GHSA-566x-hhrf-qf8m,7b5c8fe6b684239213e7e3e9d74c3dfc12599f1,https://github.com/reem/rust-ordered-float,Make assignment operators panic safe,0,e8fe06a58476ea70ac5d42d649bdf19f188f2b1c,2,20,10
+GHSA-xjxc-vfw2-cg96,15cb335e66d518a25950ff40906676f982b64a2,https://github.com/sfackler/rust-openssl,"Fix use-after-free in cms
+
+Closes #941",0,a1cb6a7328787d27aba44dc0e901394113cf0ba1,1,7,15
+GHSA-r6ff-2q3c-v3pv,dde31d26fd7b8ea23fbcb2928583a7882748e65,https://github.com/libpnet/libpnet,"Fix undefined behavior in packet field setters
+
+It is currently possible to trigger undefined behavior in field setters
+created by the `packet` macro, such as `MutableIpv4Packet::set_payload`,
+by setting a buffer larger than the remaining space in the packet
+buffer.
+
+Fix this by replacing the unsafe `copy_nonoverlapping` call with
+`copy_from_slice`. This function still compiles to `memcpy`, but
+includes a range check which which will panic if the destination buffer
+is too small.
+
+Fixes #449. Fixes #411.",0,dcca97dcb662d02cf3d1b0ea61e878fa20972fa3,2,27,8
+GHSA-q9h2-4xhf-23xx,7d13cc67dbe94ab0340e2a492c489dc16815300,https://github.com/bodil/im-rs,Add Send and Sync bounds for TreeFocus,0,3f4e01a43254fe228d1ce64e47dfaf4edc8f4f19,1,2,2
+GHSA-7v2r-wxmg-mgvc,623b87397a569729c4bcabae747823c5668cce9,https://github.com/tiny-http/tiny-http,Fix RUSTSEC-2020-0031,0,4770db9760c99775f23594bc21dd3420e0388ef0,1,1,1
+RUSTSEC-2021-0037,d4133288261612d43853245aa886e1a3a0d2dbf,https://github.com/diesel-rs/diesel,"Fix a use-after-free bug in our Sqlite backend
+
+We've missused `sqlite3_column_name`. The
+[SQLite](https://www.sqlite.org/c3ref/column_name.html) documentation
+states that the following:
+
+> The returned string pointer is valid until either the prepared statement
+> is destroyed by sqlite3_finalize() or until the statement is automatically
+> reprepared by the first call to sqlite3_step() for a particular
+> run or until the next call to sqlite3_column_name()
+> or sqlite3_column_name16() on the same column.
+
+As part of our `query_by_name` infrastructure we've first received all
+field names for the prepared statement and stored them as string slices
+for later use. After that we called `sqlite3_step()` for the first time,
+which invalids the pointer and therefore the stored string slice.
+I've opted to fix this by just populating the field name map after the
+first call to `sqlite3_step()` as a minimal fix for this issue for the
+1.x release series. We need to investigate further if and how a similar
+issue can occur with the current master branch. The corresponding code
+changed quite a lot and at least this particular behaviour is not
+possible anymore.",0,8e9e639983b78fce456fd5cf5ea8aa1f0556ff66,1,41,14
+GHSA-pvh2-pj76-4m96,a90cf79fcac7c8b56ee5301752938aa1d2e4260,https://github.com/rust-blockchain/evm,Fix Ethereum non-compliance in JUMPI,0,b632ef27f9415e7db1b818d39b10ca2228629111,1,1,1
+RUSTSEC-2018-0006,d61b49cb90391fc4f7f72a1abe597476c8651a0,https://github.com/chyh1990/yaml-rust,Prevent too deep recursion,0,acdd53a6aedcd2ba99006eedeed651d389c19e9d,2,18,4
+GHSA-6p3c-v8vc-c244,86354da6f5ea3af009c42331dc20c9a717fe980,https://github.com/nervosnetwork/molecule,fix: an API for partial read FixVec is incorrect,0,03c2872648e7fd43878ab5ae6657edfc8f42a801,2,10,1
+GHSA-3r3g-g73x-g593,18e3cc6b1f611809eed260b05797e2b488157ac,https://github.com/coreos/coreos-installer,"download: explicitly check GPG exit status after copy (CVE-2021-20319)
+
+Under normal conditions, GzDecoder doesn't read EOF from the underlying
+source; it stops reading as soon as it reaches the gzip trailer.  Since
+the wrapped GpgReader doesn't see EOF, it doesn't check the exit status of
+GPG, and a bad signature will not be noticed.  XzDecoder is not affected.
+
+This allows bypass of signature verification under uncommon circumstances.
+Notably, installing from a live ISO or PXE image uses either osmet images
+(Fedora CoreOS or RHEL CoreOS) or a full copy of the install image (RHEL for
+Edge), and these are not affected because they're trusted (they come from
+the installation media we've booted from).  These flows are affected:
+
+1.  Installing with --image-file, --image-url, or coreos.inst.image_url.
+For example, if a user has a local mirror of installation images, an
+attacker could replace an image with a gzip-compressed alternative (even
+if the file extension is .xz).  The result:
+
+$ coreos-installer install --image-url http://localhost:8080/image.xz /dev/loop0
+Downloading image from http://localhost:8080/image.xz
+Downloading signature from http://localhost:8080/image.xz.sig
+> Read disk 749.9 MiB/749.9 MiB (100%)
+gpg: Signature made Mon 20 Sep 2021 02:41:50 PM EDT
+gpg: using RSA key 8C5BA6990BDB26E19F2A1A801161AE6945719A39
+gpg: BAD signature from ""Fedora (34) <fedora-34-primary@fedoraproject.org>"" [ultimate]
+Install complete.
+
+GPG still complains when its stdin is closed, but coreos-installer doesn't
+notice.  Automation that relies on coreos-installer's exit status will not
+notice either.
+
+2. `coreos-installer download --decompress --image-url`:
+
+$ coreos-installer download --decompress --image-url http://localhost:8080/image.xz
+> Read disk 749.9 MiB/749.9 MiB (100%)
+gpg: Signature made Mon 20 Sep 2021 02:41:50 PM EDT
+gpg: using RSA key 8C5BA6990BDB26E19F2A1A801161AE6945719A39
+gpg: BAD signature from ""Fedora (34) <fedora-34-primary@fedoraproject.org>"" [ultimate]
+./image
+
+Again, coreos-installer exits 0.
+
+3. Installing with default parameters, when not using live install media
+with osmet, if the Red Hat-controlled S3 bucket is compromised or the
+HTTPS connection is successfully MITMed.
+
+4. `coreos-installer download --decompress` if the S3 bucket is
+compromised or the HTTPS connection is MITMed.
+
+Fix this by having callers explicitly check the signature verification
+result after the fetch pipeline reaches EOF.  This is easiest to do within
+the mutable borrow rules by adding a new VerifyReader which wraps either
+GpgReader if signatures are being checked, or the underlying source
+otherwise.  To ensure that the explicit check is done consistently, drop
+the implicit one at EOF, so that it'll be clear from a missing GPG report
+on stderr that the API was not used correctly.",0,0bc523fe4c6a173291f60fefdc3714934c5ec955,2,81,30
+GHSA-3r3g-g73x-g593,99c67ffdf9111e5d3b0de9f4be2447c4b4ca84f,https://github.com/coreos/coreos-installer,"*: use bufread versions of decompressors where possible
+
+In cases where we're decompressing from a BufReader, use the bufread
+versions of the decompressors to prevent them from wrapping the input in
+another BufReader internally.",0,18e3cc6b1f611809eed260b05797e2b488157ac8,2,3,3
+GHSA-3r3g-g73x-g593,dbcbefe069fcd53ebc1981fc97fd5b3f94f396d,https://github.com/coreos/coreos-installer,"io/compress: fail on trailing garbage in gzip-compressed streams
+
+Under normal conditions, GzDecoder doesn't read EOF from the underlying
+source; it stops reading as soon as it reaches the gzip trailer.  As a
+result, trailing garbage will not be noticed.  Fix this by trying to read
+one more byte from the underlying source and failing if we get one.
+
+Requires the previous commit.
+
+Bug discovered by @raballew; thanks!",0,99c67ffdf9111e5d3b0de9f4be2447c4b4ca84ff,1,54,2
+GHSA-686h-j8r8-wmfm,1faf18eee11f14969b77ae0f76dcd9ebd437d0c,https://github.com/Xudong-Huang/rcu_cell,Fix Send/Sync impl of RcuCell<T>,0,0e4dc8cd07002a583462994ab4bcfecdf3338fae,1,2,2
+GHSA-v935-pqmr-g8v9,0940e509dca55d19197adbe7cb5c1d5423a390c,https://github.com/rust-num/num-bigint,"Fix a mac3 panic when an operand is all-zero
+
+Reported-by: Guido Vranken <guidovranken@gmail.com>
+Reported-by: Arvid Norberg <arvid.norberg@gmail.com>",0,1fc25378c1caf8f97ce56da58ed8bc40a13e3e76,2,197,6
+GHSA-v935-pqmr-g8v9,8008707fea97b9215f3b949a0eb6044aec709a3,https://github.com/rust-num/num-bigint,"Fix an undersized buffer panic in multiplication
+
+Reported-by: Guido Vranken <guidovranken@gmail.com>
+Reported-by: Arvid Norberg <arvid.norberg@gmail.com>",0,0940e509dca55d19197adbe7cb5c1d5423a390cf,2,17,3
+GHSA-xwqr-xmgg-j69q,c13df26bf356b8c33c390b310f22227a7fd654d,https://github.com/solana-labs/rbpf,Guards all integer_arithmetic in elf.rs,0,6a974772f1cbd1220bfc288786fdea51cadd4860,1,81,48
+RUSTSEC-2019-0026,fae052b834b097ced9a89a8fff8466e18f38307,https://github.com/sodiumoxide/sodiumoxide,Fix Digest PartialEq,0,fbfe0392ed569d8da8f17af5bbad2905e2518449,2,22,1
+GHSA-ppqp-78xx-3r38,e88c6ff22e0d1a7b0733d9b90fadc4722763d7d,https://github.com/tafia/calamine,Fix security issue #199,0,d06428a7a4a34ffe6447b0718f6fe27b5da2f595,1,1,3
+GHSA-32v7-ghpr-c8hg,e093c2b7b6ecbf34f8afbd87ee111df256957e4,https://github.com/jeaye/ncurses-rs,Marked printw function as deprecated,0,55be2ec2f9e69f2b3870547be75cff93d27ebc7c,1,3,2
+GHSA-32v7-ghpr-c8hg,a9165de8065bab6ee6969a1b31ddac549f634c1,https://github.com/jeaye/ncurses-rs,Removed unsafe,0,e093c2b7b6ecbf34f8afbd87ee111df256957e41,1,1,1
+GHSA-32v7-ghpr-c8hg,7fcee591341b3d37c25676cbac868bd27b4b208,https://github.com/jeaye/ncurses-rs,Added unsafe inside function,0,a9165de8065bab6ee6969a1b31ddac549f634c15,1,1,1
+RUSTSEC-2019-0013,0df01c9d0c5d42166dc49e903002f53978ef10e,https://github.com/mvdnes/spin-rs,Rewrite RwLock to use folly upgradeable implementation,0,c23974b7aba907b050aa688d65c9b46fda156de9,1,217,78
+RUSTSEC-2019-0013,6d1c1e335998339263f651f33d34220c4bebc5c,https://github.com/mvdnes/spin-rs,"Move upgrade / downgrade functions to the RAII guards, and run cargo fmt",0,0df01c9d0c5d42166dc49e903002f53978ef10e5,1,172,113
+RUSTSEC-2019-0013,2aab6e058ae16f9caa3aff2a6bf2602926eb60a,https://github.com/mvdnes/spin-rs,Make upgradeable / writable guards invariant over T,0,6d1c1e335998339263f651f33d34220c4bebc5c6,1,10,0
+RUSTSEC-2019-0013,ba0220287e8801d6ecff0de2199b39d2e699698,https://github.com/mvdnes/spin-rs,Abstract write and upgrade over compare_exchange strong/weak variants,0,3cf5453294e7f24fbb7299681e00f5f0c5a7fbd8,1,77,67
+RUSTSEC-2019-0013,4bda3d9e3837e90008de3a26fb0d8182fc5227e,https://github.com/mvdnes/spin-rs,Use strong ordering in RwLock try_write,0,ba0220287e8801d6ecff0de2199b39d2e6996989,1,1,1
+RUSTSEC-2020-0081,75cdea2c14c81678dbecdfba67c8b75c583b1cd4,https://github.com/tokio-rs/mio,Windows: Don't assume memory layout of std::net::SocketAddr,0,102b62993f717d2b71897834678029e897ea077f,3,52,14
+RUSTSEC-2020-0081,a790f9935ab0f74f28d24507c19b7ac0ad0e3b14,https://github.com/tokio-rs/mio,Don't assume memory layout of std::net::SocketAddr,0,f5017fae8a3d3bb4b4cada25b01a2d76a406badc,3,65,21
+RUSTSEC-2021-0009,f1320f02cb404ec6e8ad5ef638260dcacc9c8b9,https://github.com/liebharc/basic_dsp,fix panic safety issue: guard against double drop,0,7375e9f02769c95bf1bdb58cb2130afcccdf3f50,1,38,34
+GHSA-xvc9-xwgj-4cq9,b3a53796b7335d22b9c3d6810dda3fc9acf15df,https://github.com/hyperium/http,fix capacity overflows in HeaderMap::reserve,0,32f1ae19f1d26c815cc935b742a94996f5a8a9bd,2,18,0
+GHSA-c3cw-c387-pj65,a064d69ba4a62d455cab67693cd61e6509db5a1,https://github.com/crossbeam-rs/crossbeam,Use ManuallyDrop in queues,0,8f353c52e918029466e42cd0eefc34849c15c532,2,15,13
+GHSA-rm4w-6696-r77p,4496dd9c1cf543536c024c6d47f0b62613c75f5,https://github.com/smol-rs/nb-connect,"switch to socket2
+
+Signed-off-by: Marc-Antoine Perennou <Marc-Antoine@Perennou.com>",0,75e5f171514089a66d771f13c993eda4800ca1f4,1,42,253
+RUSTSEC-2019-0009,4ba0d0f689440963e38b8adbe7fc2cabc6e573d,https://github.com/servo/rust-smallvec,Fix using `grow` to the same size.,0,88b62b65fae5bc144d9e9cacf0778c8ed1ed509b,1,16,0
+GHSA-rh89-x75f-rh3c,31a8de9c2f9b096352c4df3877aa8d3df5b73d0,https://github.com/Gilnaa/memoffset,Fixed soundness issues and removed nested member access.,0,ee03d7a6d2504de16ad17daf744d8267de243736,5,21,81
+RUSTSEC-2020-0062,2d7317336ebaba7a6ffd778dbc8c52b5bbbd151,https://github.com/rust-lang/futures-rs,"Fix Sync issues with FuturesUnordered
+
+This updates non-mutable FuturesUnordered methods to be thread-safe,
+ensuring that Sync trait requirements are met without breaking existing
+functionality.
+
+The FuturesUnordered::link method used by FuturesUnordered::push has
+been modified to use atomic operations to allow for lock-free insertion
+of new futures while still allowing FuturesUnordered::iter and
+IterPinRef itself to operate simultaneously. FuturesUnordered::len has
+been removed, with each Task now storing a snapshot of the list length
+at the time when the future was added, so a synchronized list length can
+always be read after an atomic load of FuturesUnordered::head_all. This
+increases the memory overhead of each task slightly, but it allows us to
+retain the original iterator behavior without dramatically increasing
+the performance cost.
+
+Operations that require mutable FuturesUnordered access have not been
+made lock-free, with direct mutable access to otherwise atomic values
+used when possible to avoid unnecessary overhead.",0,e76780341234cda6e77edec7ece83559bbcd0162,4,232,58
+GHSA-c3m3-c39q-pv23,70c87a49451c4dfcb170461ad9c55fe2f104b7b,https://github.com/gnzlbg/slice_deque,Fix issue 57,0,57b1a84138222f5416eeeec33d834af0041c81c2,1,20,1
+GHSA-wr55-mf5c-hhwm,11f396ca9accf6ae000db13a44505b57608733c,https://github.com/Richard-W/late-static,Implement Sync for LateStatic<T> only if T is Sync too,0,9916669a85f88609e469fa6f8b4c6f62b2b84b12,1,1,1
+GHSA-rxr4-x558-x7hw,26b249075930b46cfafc70b1d18fd0cb35fd231,https://github.com/servo/rust-smallvec,"Make insert_many panic-safe
+
+Fixes #96.",0,bfdd7eed5e1171585919e141ae0d74a6fd32bc51,1,51,11
+GHSA-rxr4-x558-x7hw,1f4025218c4321ea42ad01d80dd6110def2d86d,https://github.com/servo/rust-smallvec,"Make from_elem panic-safe
+
+Fixes #101",0,26b249075930b46cfafc70b1d18fd0cb35fd2314,1,32,7
+RUSTSEC-2022-0007,b1f4e6d166b6c5cc693bfbfe5856db4b098dbd8,https://github.com/uazu/qcell,Fix soundness issues with covariant `Q` argument,0,b93f102975ab48859615548487f318f29dea838a,2,25,11
+RUSTSEC-2022-0007,b03b1588858f0a47ab5909bfa6b4e1b395292b16,https://github.com/uazu/qcell,"We can remove the need for an explicit `Sync` impl for LCellOwner
+
+by using Invariant<Q> for Id<'id> as-well",0,b1f4e6d166b6c5cc693bfbfe5856db4b098dbd83,1,3,3
+RUSTSEC-2020-0059,392a889f02c17edf0df4a9c08c134896b045387,https://github.com/rust-lang/futures-rs,"Fix unsoundness in MappedMutexGuard
+
+See #2239",0,7340d3d5d6fe8082a73069582b048ebaef6626b1,1,8,6
+RUSTSEC-2021-0012,0e6006de464caa331643f86cd2d9ba3b32b0983,https://github.com/hrektts/cdr-rs,Fix not to use uninitialized memory,0,880a281afe6f49109a90e2a8bb943c02a360bf49,1,1,1
+GHSA-j8qq-58cr-8cc7,aabf5562f8c6374ab30f615b28e0cff9b5c79e5,https://github.com/Enet4/bra-rs,"Fix potential vulnerability (#1)
+
+- Implementations of Read still can try to read `buf` on `read`,
+  even though they shouldn't
+- also derive Debug and Clone for GreedyAccessReader
+- all uses of unsafe were removed",0,ff2b2995f43c24193aa71a3801bf7af287e2ca98,1,7,18
+RUSTSEC-2021-0004,f6d9bc6e8f6ad7f0d949a444a1c1d91d6d837e6,https://github.com/khuey/lazy-init,"[breaking] Add `U: Send` clause to `unsafe impl<T, U> Sync for LazyTransform<T, U>`
+
+As per #9, a `Send` bound is required on `U` to make sure references aren't sent to threads other than the one the `U` was created on.",0,054096b3987782cc6805324ba4df4dbe8c8b19b7,1,1,1
+GHSA-69gw-hgj3-45m7,50a50ed90d6ad78d812a40680257d8338843869,https://github.com/servo/rust-smallvec,Fix using `grow` to shrink to inline.,0,19de50108d403efaa7cd979eac3bb97a4432fd4b,1,18,0
+RUSTSEC-2021-0090,ea809ba4ae37c4b0de54158e05699f1907c9e83,https://github.com/ash-rs/ash,"util: Zero-initialize result to prevent possible uninit memory read
+
+Fixes https://github.com/MaikKlein/ash/issues/354
+
+`io::Read::read_exact` does not receive `MaybeUninit` memory and a trait
+implementation can possibly read from our uninitialized vector without
+`unsafe`, which is UB.  As there is no proper solution to this problem
+yet (see linked issue), our safest bet is to just take the perf-hit and
+zero-initialize this vector.",0,17149bd791cd6e09b145063a238d3e27d855780c,1,9,8
+GHSA-gffv-5hr2-f9gj,ffa2e8d54e4701e4d1f11fcfa5e1497ed6d4c8d,https://github.com/orion-rs/orion,Fix #46: Reset the state even if it hasn't been finalized yet,0,633ee3a673133b06bfdad235e5327347a9a91b99,4,96,36
+GHSA-9rg7-3j4f-cf4x,9803f31fbd1717d482d848f041044d061fca6da,https://github.com/Connicpu/com-impl,fix #1 call addref in queryinterface,0,bc6bb5384cac1278e9e89e65400ff9e218b705d1,1,2,0
+GHSA-mcrf-7hf9-f6q5,8559aee7c5485426e3d5f7cfb7368248b6ca437,https://github.com/3Hren/msgpack-rust,"Fix unchecked vector pre-allocation
+
+Fixes #151 / RUSTSEC-2017-0006",0,2c62cc04dcabfd7327d0c0ea730d9a4e35b5f447,3,59,8
+GHSA-9mxw-4856-9cm5,cb068895ca2aa236ad8bc858c80b2209cbc4f04,https://github.com/a1ien/rusb,"Fix Unsound Send/Sync bound
+
+As mention #44 UsbContext trait has neither Send nor Sync bound and can be implemented from the user side. This permits writing a custom non-thread safe UsbContext implementation in safe Rust code, which can cause a data race when used with Device or DeviceHandle.
+So required UsbContext implement Send + Sync",0,12ee91dd081428c610d3ccb5bba422198beee084,1,1,1
+RUSTSEC-2019-0028,c66cd3085742c50ae231c77f1bc5b577d0cceb9,https://github.com/google/flatbuffers,Fix Follow implementation for bool,0,842f672bafd560beeeeebed7accf196101003625,1,8,1
+GHSA-p9m5-3hj7-cp5r,b3356ccba102cffa2c63cb61be5b704a29c474b,https://github.com/rust-lang/futures-rs,Use once_cell for sound `&'static Waker` instances,0,30e50c62422f116511b903d53a59a489dbdbecf3,2,29,13
+GHSA-hhw2-pqhf-vmx2,3f733cd056098d5e8de6ae8da40950500edc881,https://github.com/actix/actix-net,actix-utils: Remove unsound custom Cell as well,0,8d0bd7ce1c77ababad0d44785da37854d5c869d2,8,86,124
+RUSTSEC-2020-0121,34c2b9e51cd7b85a3366104092ca4e5e9fab227,https://github.com/SonicFrog/abox,send/sync fix to prevent misuse,0,5abe75222bc49af6b62ea37f87d7be0c56973310,1,2,2
+GHSA-xrg3-hmf3-rvgw,e1720ce38452c7f94d2ff32d2c120d7d427e2eb,https://github.com/pyrossh/rust-embed,"Prevent path traversal attacks in debug mode
+
+This is not a problem in release mode because we are in control of which
+files are loaded/embedded during compile time.",0,34299eb1bc41da92fe5d474036d49b8f2c5b3c00,2,24,1
+RUSTSEC-2020-0048,dede6fef9a50650efdd1ee36b2466911cc1b195,https://github.com/actix/actix-web,"Use `Pin<Box<S>>` in `BodyStream` and `SizedStream`
+
+Fixes #1321
+
+A better fix would be to change `MessageBody` to take a `Pin<&mut
+Self>`, rather than a `Pin<&mut Self>`. This will avoid requiring the
+use of `Box` for all consumers by allowing the caller to determine how
+to pin the `MessageBody` implementation (e.g. via stack pinning).
+
+However, doing so is a breaking change that will affect every user of
+`MessageBody`. By pinning the inner stream ourselves, we can fix the
+undefined behavior without breaking the API.
+
+I've included @sebzim4500's reproduction case as a new test case.
+However, due to the nature of undefined behavior, this could pass (and
+not segfault) even if underlying issue were to regress.
+
+Unfortunately, until rust-lang/unsafe-code-guidelines#148 is resolved,
+it's not even possible to write a Miri test that will pass when the bug
+is fixed.",0,e634e6484713d213794105758725b7f291488254,2,32,10
+RUSTSEC-2019-0023,04731e101fed08a32942d52790e1c8c6ede6188,https://github.com/Robbepop/string-interner,"Implement `Clone` manually for `StringInterner`
+
+New `clone()` implementation recreates `HashMap` to update key
+`InternalStrRef`s with pointer to newly cloned strings.
+
+`#[derive(Clone)]` requires `S: Clone` automatically, and the new
+`Clone` implementation does not require it explicitly.
+However, `S: Symbol` trait bound indirectly requires `S: Clone`, so
+the restriction for `S` is actually not changed.
+
+Fixes #9.",0,ef7a6454baabe7cd3d32b56aefb2768b4be02079,2,37,1
+RUSTSEC-2021-0035,ae13bdac8b95966a4fdef3b17aa6d2096799f7c,https://github.com/quinn-rs/quinn,"Don't assume representation of Ipv*Addr types
+
+Also, remove two uses of unsafe :)",0,2f0dc868d7ae6682edf383e6643a4923f8d916dc,1,5,5
+RUSTSEC-2021-0035,cd64316558c7faffc7e3669298e81dc9289ac22,https://github.com/quinn-rs/quinn,Don't assume representation of SocketAddr,0,ae13bdac8b95966a4fdef3b17aa6d2096799f7cb,1,29,7
+RUSTSEC-2019-0015,eb413b3d47baea8e8a0b9ce2ccd8299b354d3b7,https://github.com/llogiq/compact_arena,"Use generativity to ensure soundness even with NLL
+
+It was recently found out that edition 2018 NLL doesn't ensure
+lifetime uniqueness with the current setup. This uses a slightly
+different scheme, which unfortunately makes `InvariantLifetime`
+part of the public API, but that's a small price to pay for
+soundness.",0,947fa6ebd24c9b03f7673400ef7e76fe6bb816b8,2,71,31
+RUSTSEC-2020-0117,1e462c32e7933821ddb26dc49fd4ffa5aeca97b,https://github.com/longshorej/conqueue,add 'T: Send' to Send/Sync impls. fixes #9,0,442843346d3cb69cd54143450fef21bdd4c698f0,1,3,3
+RUSTSEC-2021-0130,416a2d480547f6b88ef6d23aa34b1fea292f65f,https://github.com/jeromefroe/lru-rs,Fix lifetimes of iterators,0,09f68c63755b35f9cf5cb5d6765cf8dc080f9ea3,1,4,4
+GHSA-4cww-f7w5-x525,3850b645a89666f3efa84c47fad17976e4702c0,https://github.com/bluejekyll/trust-dns,"reproduce error stack overflow from `.` as MX target
+
+stop additional lookup on Root name",0,ea57ae42ea20228ff29c81d6023c43f0221c9445,3,32,1
+GHSA-cgmg-2v6m-fjg7,565d508993936821950009ec4c7c1e33301db81,https://github.com/mersinvald/autorand-rs,"fix: use MaybeUninit to avoid possible dropping of uninitialized memory
+
+Closes #5",0,c838309507f9364ecf61553a6ae113dd720fdab9,1,8,4
+GHSA-r88h-6987-g79f,15b282877d1e576de2b337d8162bbf43ed1a0f2,https://github.com/Chopinsky/byte_buffer,"Add 'T: Send' for 'impl Send for Bucket2<T>'
+
+Fixes issue #2",0,79b1a5c23a4962cbcd1539af9aadbfc277981442,1,1,1
+RUSTSEC-2020-0120,a34d6e10f6f5654ed01a35288cf683d014ebc9c,https://github.com/mvertescher/libsbc-rs,"Add R: Send bound to Send impl of Decoder<R>
+fixes issue #4",0,7278b23901f93d956d9739fdfc4ced147cc3f242,1,1,1
+RUSTSEC-2021-0113,8e6daabbc6fb14972a9db5fc94f06801b2d41c2,https://github.com/metrics-rs/metrics,metrics-util: fix soundness issue with AtomicBucket<T>,0,5be6c93b6d186ca4745d1a7f2c1a42dee86c21e4,1,2,2
+RUSTSEC-2020-0123,5ba266a853bc8232993c84fe736cb87241f9506,https://github.com/libp2p/rust-libp2p,Ensure read buffer is initialised.,0,6400719ae9585f7a3620044b8fb3f86d35ef8b22,1,1,4
+GHSA-mpg5-fvwp-42m2,1f3709632dccdfd49cbcb152a2f81b95c0b1a3e,https://github.com/xacrimon/dashmap,fix rayon,0,2f488a06643cbcea7a6b572f313b273bc6b0dabf,1,2,2
+GHSA-mpg5-fvwp-42m2,fbb6ffb1d70ae520889062728476d7d607c9309e,https://github.com/xacrimon/dashmap,ref smuggle,0,f4daed99a1d19e036db06a82aaf222fbd4d64953,5,23,33
+RUSTSEC-2020-0115,b0d2bd20eb40b9cbc2958b981ba2dcd9e6f9396,https://github.com/RusPiRo/ruspiro-singleton,fix soundness,0,0565f8ef459bd336eda8a6a63d1d50cdb581c2b3,1,4,2
+GHSA-wgrg-5h56-jg27,14ee7a6f775c5018e71521b52b3c24de8a82c90,https://github.com/vitalyd/nix,"Fix memory unsafety in unistd::getgrouplist
+
+Fixes #1541",0,9a2f86f4cf9bddefc1878a124b4ee6f83e6ef064,1,12,4
+GHSA-fg7r-2g4j-5cgr,c8f82d45060c9e936ab49cd3838135208de0924,https://github.com/tokio-rs/tokio,"oneshot: prioritize closed over complete
+
+This fixes the race.
+
+Signed-off-by: Eliza Weisman <eliza@buoyant.io>",0,844dc9be2f95e2403dc50562333090af7d2d20a5,1,5,3
+RUSTSEC-2020-0006,d08bc37de3dd471ea564a954a2de1d0caf045f6,https://github.com/fitzgen/bumpalo,"realloc: Copy `old_size` number of bytes (not `new_size`) into new allocation
+
+When reallocating, if we allocate new space, we need to copy the old
+allocation's bytes into the new space. There are `old_size` number of bytes in
+the old allocation, but we were accidentally copying `new_size` number of bytes,
+which could lead to copying bytes into the realloc'd space from past the chunk
+that we're bump allocating out of, from unknown memory.
+
+If an attacker can cause `realloc`s, and can read the `realoc`ed data back, this
+could allow them to read things from other regions of memory that they shouldn't
+be able to. For example, if some crypto keys happened to live in memory right
+after a chunk we were bump allocating out of, this could allow the attacker to
+read the crypto keys.
+
+Beyond just fixing the bug and adding a regression test, I've also taken two
+additional steps:
+
+1. While we were already running the testsuite under `valgrind` in CI, because
+`valgrind` exits with the same code that the program did, if there are invalid
+reads/writes that happen not to trigger a segfault, the program can still exit
+OK and we will be none the wiser. I've enabled the `--error-exitcode=1` flag for
+`valgrind` in CI so that tests eagerly fail in these scenarios.
+
+2. I've written a quickcheck test to exercise `realloc`. Without the bug fix in
+this patch, this quickcheck immediately triggers invalid reads when run under
+`valgrind`. We didn't previously have quickchecks that exercised `realloc`
+beacuse `realloc` isn't publicly exposed directly, and instead can only be
+indirectly called. This new quickcheck test exercises `realloc` via
+`bumpalo::collections::Vec::resize` and
+`bumpalo::collections::Vec::shrink_to_fit` calls.
+
+Fixes #69",0,ea70b7580a259c88067274ae23b28c287ccfea6e,2,102,16
+RUSTSEC-2020-0114,0562cbfe79f68e061628e5cf0d29d9f879b6913,https://github.com/video-audio/va-ts,Fix unsound impl of Send. resolves #4,0,42798bece650f738ad4e376c98dca0cd9b1af21d,1,1,1
+GHSA-xp6v-qx65-4pp7,e7fb2f5b5f95437a37d99b8c430c8adc9045f35,https://github.com/Devolutions/gfwx-rs,"Implement Send and Sync in ImageChunkMut only for types that are also Sync / Send
+
+Accepting types that are not send or sync is not safe.",0,59521ca48f635a5a467d73f29bdbb1a6494a455d,1,2,2
+GHSA-9j8q-m9x5-9g6j,ef4aa05cdd3b81ae9f8a42acd211e95530b1ab7,https://github.com/google/rust-async-coap,add send/sync bounds to prevent data race,0,6a7b592a23de0c9d86ca399bf40ecfbf0bff6e62,1,2,2
+RUSTSEC-2021-0070,5bff5368bf38ddfa31416e4ae9897b163031a51,https://github.com/dimforge/nalgebra,Manually implement Serialize and Deserialize for VecStorage,0,58bea21d74e9f6df1376eb89ae94f5c1c3184101,2,76,3
+GHSA-69vj-xx27-g45w,55dd22f447492e272b75230c3d8108faa10c6fc,https://github.com/petabi/eventio,require send to avoid data racing,0,53a04203613c8137865664ab98c304da37aa2379,1,1,1
+RUSTSEC-2022-0012,5f8e17b1c144e49d244e4e15b985ffa498c4ede,https://github.com/jorgecarleitao/arrow2,Fixed unsound,0,a87c758a80facbfbcde4768ad42cdf4c5c2cc5a8,1,3,3
