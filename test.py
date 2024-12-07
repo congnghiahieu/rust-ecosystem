@@ -9,6 +9,7 @@ import sqlite3
 import sys
 from pprint import pprint as print
 from typing import Callable, Optional
+from urllib.parse import urlparse
 
 import pandas as pd
 import requests
@@ -175,7 +176,104 @@ def merge_data():
     json.dump(data, open("merge.json", "w"), indent=2)
 
 
-def dowload_old_commit_files():
+def join_table():
+    conn = sqlite3.connect("CVEfixes.db")
+    cursor = conn.cursor()
+
+    cursor.execute(
+        f"SELECT cve_id, parents, commits.hash, repo_url, file_change_id, old_path, new_path FROM commits INNER JOIN file_change ON commits.hash = file_change.hash WHERE LENGTH(commits.hash) >= 39 GROUP BY commits.hash, old_path"
+    )
+    # GROUP BY commits.hash, old_path
+    rows = cursor.fetchall()
+    columns = [description[0] for description in cursor.description]
+    data = [dict(zip(columns, row)) for row in rows]
+
+    count_set = set()
+    domain_set = set()
+
+    for obj in data:
+        # https://gitlab.com/KonradBorowski/array-macro/-/raw/a9d5b42ca96365159102f9d18d71be343f6c42e9/src/lib.rs
+        # https://gitlab.com/KonradBorowski/array-macro/-/blob/a9d5b42ca96365159102f9d18d71be343f6c42e9/src/lib.rs
+        # https://gitlab.com/KonradBorowski/array-macro/-/commit/a9d5b42ca96365159102f9d18d71be343f6c42e9
+
+        # https://raw.githubusercontent.com/lettre/lettre/d930c42d5069e344a9dfa84ebe4b60bf3b11ac64/lettre/src/smtp/client/mod.rs
+        # "https://github.com/lettre/lettre/blob/8bfc20506cc5e098fe6eb3d1cafe3bea791215ce/lettre/src/smtp/client/mod.rs"
+        # https://github.com/lettre/lettre/commit/8bfc20506cc5e098fe6eb3d1cafe3bea791215ce
+
+        # parse_result = urlparse(obj["repo_url"])
+        # domain_set.add(parse_result.netloc)
+        # count_set.add(f"{obj["hash"]}{obj["old_path"]}")
+
+        urlparse_result = urlparse(obj["repo_url"])
+
+        match urlparse_result.netloc:
+            case "github.com":
+                repo_blob_url = os.path.join(obj["repo_url"], "blob")
+                raw_content_url = obj["repo_url"].replace(
+                    "https://github.com/", "https://raw.githubusercontent.com/"
+                )
+                parent_url = os.path.join(obj["repo_url"], "commit", obj["parents"])
+                commit_url = os.path.join(obj["repo_url"], "commit", obj["hash"])
+                pass
+            case "gitlab.com":
+                repo_blob_url = os.path.join(obj["repo_url"], "-", "blob")
+                raw_content_url = os.path.join(obj["repo_url"], "-", "raw")
+                parent_url = os.path.join(
+                    obj["repo_url"], "-", "commit", obj["parents"]
+                )
+                commit_url = os.path.join(obj["repo_url"], "-", "commit", obj["hash"])
+                pass
+            case _:
+                repo_blob_url = ""
+                raw_content_url = ""
+                parent_url = ""
+                commit_url = ""
+                pass
+
+        obj["parent_url"] = parent_url
+        obj["commit_url"] = commit_url
+        obj["old_url"] = os.path.join(
+            repo_blob_url,
+            obj["parents"],
+            obj["old_path"],
+        )
+        obj["new_url"] = os.path.join(
+            repo_blob_url,
+            obj["hash"],
+            obj["new_path"],
+        )
+        obj["raw_old_url"] = os.path.join(
+            raw_content_url,
+            obj["parents"],
+            obj["old_path"],
+        )
+        obj["raw_new_url"] = os.path.join(
+            raw_content_url,
+            obj["hash"],
+            obj["new_path"],
+        )
+
+    print(len(data))
+    print(len(count_set))
+
+    # with open("domain.json", "w") as json_file:
+    #     json.dump(list(domain_set), json_file, indent=2)
+
+    with open("join.json", "w") as json_file:
+        json.dump(data, json_file, indent=2)
+
+    # def conver_to_json(table_name: str, output_file: str):
+    #     cursor.execute(f"SELECT * FROM {table_name}")
+    #     rows = cursor.fetchall()
+    #     columns = [description[0] for description in cursor.description]
+    #     data = [dict(zip(columns, row)) for row in rows]
+    #     with open(output_file, "w") as json_file:
+    #         json.dump(data, json_file, indent=2)
+
+    conn.close()
+
+
+def dowload_code_files():
     def download_file(url: str, dest: str):
         response = requests.get(url)
         with open(dest, "wb") as file:
@@ -197,6 +295,91 @@ def dowload_old_commit_files():
 
         for process in processes:
             process.join()
+
+
+def get_join_dataset():
+    join_data = json.load(open("join.json"))
+
+    manager = multiprocessing.Manager()
+    safe_shared_list = manager.list()
+    failed_url_list = manager.list()
+    safe_target0_counter = multiprocessing.Value("i", 0)  # Shared
+    safe_target1_counter = multiprocessing.Value("i", 0)  # Shared
+
+    processes = []
+
+    def create_one_record(data_obj: dict[str, str], url: str):
+        response = requests.get(url)
+
+        if not response.ok:
+            failed_url_list.append(
+                {
+                    "url": url,
+                    "status_code": response.status_code,
+                    "reason": response.reason,
+                }
+            )
+            return
+
+        if data_obj["target"] == 0:
+            with safe_target0_counter.get_lock():  # Ensure atomic operation
+                safe_target0_counter.value += 1
+        elif data_obj["target"] == 1:
+            with safe_target1_counter.get_lock():  # Ensure atomic operation
+                safe_target1_counter.value += 1
+
+        safe_shared_list.append(
+            {
+                **data_obj,
+                "func": response.text,
+            }
+        )
+
+    for obj in join_data:
+        parent_commit_process = multiprocessing.Process(
+            target=create_one_record,
+            args=(
+                {
+                    "project": obj["repo_url"].split("/")[-1],
+                    "target": 1,
+                    "commit_id": obj["parents"],
+                    "file_path": obj["old_path"],
+                },
+                obj["raw_old_url"],
+            ),
+        )
+        fix_commit_process = multiprocessing.Process(
+            target=create_one_record,
+            args=(
+                {
+                    "project": obj["repo_url"].split("/")[-1],
+                    "target": 0,
+                    "commit_id": obj["hash"],
+                    "file_path": obj["new_path"],
+                },
+                obj["raw_new_url"],
+            ),
+        )
+
+        processes.append(parent_commit_process)
+        processes.append(fix_commit_process)
+        parent_commit_process.start()
+        fix_commit_process.start()
+
+    for process in processes:
+        process.join()
+
+    print(f"Total bug rust files: {len(safe_shared_list)}")
+    print(f"Total target 0 rust files: {safe_target0_counter.value}")
+    print(f"Total target 1 rust files: {safe_target1_counter.value}")
+
+    with open("dataset.join.json", "w") as json_file:
+        json.dump(list(safe_shared_list), json_file, indent=2)
+    with open("failed.join.json", "w") as json_file:
+        json.dump(list(failed_url_list), json_file, indent=2)
+
+
+get_join_dataset()
 
 
 def get_bug_dataset(code_dir: str, outfile: str):
@@ -337,25 +520,23 @@ if __name__ == "__main__":
     # copy_apart("downloads.python.100", "downloads.python.50", 0.5)
     # copy_apart("downloads.python.100", "downloads.python.70", 0.7)
 
-    get_bug_dataset("downloads.python.100", "bug.rust.100.json")
+    # get_bug_dataset("downloads.python.100", "bug.rust.100.json")
     # get_bug_dataset("downloads.python.50", "bug.rust.50.json")
     # get_bug_dataset("downloads.python.70", "bug.rust.70.json")
 
-    PERCENT = 0.02
-    OUTNAME = f"safe.rust.{int(PERCENT * 100)}"
-    get_safe_rust_files(PERCENT)
-    get_safe_dataset(OUTNAME, f"{OUTNAME}.json")
+    # PERCENT = 0.02
+    # OUTNAME = f"safe.rust.{int(PERCENT * 100)}"
+    # get_safe_rust_files(PERCENT)
+    # get_safe_dataset(OUTNAME, f"{OUTNAME}.json")
 
-    combile_bug_and_safe_dataset(
-        "safe.rust.2.json", "bug.rust.100.json", "dataset.rust.json"
-    )
+    # combile_bug_and_safe_dataset(
+    #     "safe.rust.2.json", "bug.rust.100.json", "dataset.rust.json"
+    # )
 
     # merge_data()
     # get_diff()
 
     # get_project_data()
-
-    # dowload_old_commit_files()
 
     def get_csv_data():
         select_func = None
@@ -377,5 +558,3 @@ if __name__ == "__main__":
             ("commits", "commits.json"),
         ]
         connect_and_traverse_db(db_path, table_names)
-
-    # file_change_num_files_1_no_dups()
