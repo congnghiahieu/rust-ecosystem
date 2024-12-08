@@ -1,0 +1,5 @@
+'Total join dataset: 390'
+'Total crawled bug rust files: 381'
+'Total file in projects folder: 7048'
+'Total crawled safe rust files: 1457'
+'Total failed rust files: 0'

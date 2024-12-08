@@ -348,23 +348,23 @@ def get_join_dataset():
                 obj["raw_old_url"],
             ),
         )
-        fix_commit_process = multiprocessing.Process(
-            target=create_one_record,
-            args=(
-                {
-                    "project": obj["repo_url"].split("/")[-1],
-                    "target": 0,
-                    "commit_id": obj["hash"],
-                    "file_path": obj["new_path"],
-                },
-                obj["raw_new_url"],
-            ),
-        )
+        # fix_commit_process = multiprocessing.Process(
+        #     target=create_one_record,
+        #     args=(
+        #         {
+        #             "project": obj["repo_url"].split("/")[-1],
+        #             "target": 0,
+        #             "commit_id": obj["hash"],
+        #             "file_path": obj["new_path"],
+        #         },
+        #         obj["raw_new_url"],
+        #     ),
+        # )
 
         processes.append(parent_commit_process)
-        processes.append(fix_commit_process)
+        # processes.append(fix_commit_process)
         parent_commit_process.start()
-        fix_commit_process.start()
+        # fix_commit_process.start()
 
     for process in processes:
         process.join()
@@ -379,7 +379,132 @@ def get_join_dataset():
         json.dump(list(failed_url_list), json_file, indent=2)
 
 
-get_join_dataset()
+def get_target_1_dataset(our_dir: str):
+    join_data = json.load(open("join.json"))
+
+    manager = multiprocessing.Manager()
+    safe_shared_list = manager.list()
+    failed_url_list = manager.list()
+
+    processes = []
+
+    def create_one_record(data_obj: dict[str, str], url: str):
+        response = requests.get(url)
+
+        if not response.ok:
+            failed_url_list.append(
+                {
+                    "url": url,
+                    "status_code": response.status_code,
+                    "reason": response.reason,
+                }
+            )
+            return
+
+        safe_shared_list.append(
+            {
+                **data_obj,
+                "func": response.text,
+            }
+        )
+
+    for obj in join_data:
+        parent_commit_process = multiprocessing.Process(
+            target=create_one_record,
+            args=(
+                {
+                    "project": obj["repo_url"].split("/")[-1],
+                    "target": 1,
+                    "commit_id": obj["parents"],
+                    "file_path": obj["old_path"],
+                },
+                obj["raw_old_url"],
+            ),
+        )
+
+        processes.append(parent_commit_process)
+        parent_commit_process.start()
+
+    for process in processes:
+        process.join()
+
+    print(f"Total join dataset: {len(join_data)}")
+    print(f"Total crawled bug rust files: {len(safe_shared_list)}")
+
+    with open(os.path.join(our_dir, "target.1.json"), "w") as json_file:
+        json.dump(list(safe_shared_list), json_file, indent=2)
+    with open(os.path.join(our_dir, "failed.1.json"), "w") as json_file:
+        json.dump(list(failed_url_list), json_file, indent=2)
+
+
+def get_safe_random_dataset(our_dir: str, percent: float):
+    if not (0 <= percent <= 1):
+        raise ValueError("Percent must be between 0 and 1")
+
+    SAFE_RUST_SRC_DIR = "/home/hieucien/Workspace/rust-parser/tests/projects"
+    file_list = [
+        filepath
+        for filepath in glob.glob(f"{SAFE_RUST_SRC_DIR}/**/*.rs", recursive=True)
+        if os.path.isfile(filepath)
+    ]
+
+    manager = multiprocessing.Manager()
+    safe_shared_list = manager.list()
+    failed_url_list = manager.list()
+    processes = []
+
+    def create_safe_record(data_obj: dict[str, str], filepath: str):
+        with open(filepath) as f:
+            try:
+                content = f.read()
+                safe_shared_list.append(
+                    {
+                        **data_obj,
+                        "func": content,
+                    }
+                )
+            except Exception as e:
+                print(f"Error reading file: {filepath}")
+                failed_url_list.append(
+                    {
+                        "filepath": file_path,
+                        "reason": str(e),
+                    }
+                )
+                print(e)
+
+    for file_path in file_list:
+        ran_num = random.choice(range(1, 101))
+        if ran_num > percent * 100:
+            continue
+
+        safe_commit_process = multiprocessing.Process(
+            target=create_safe_record,
+            args=(
+                {
+                    "project": "",
+                    "target": 0,
+                    "commit_id": generate_random_commit_hash(),
+                    "file_path": file_path,
+                },
+                file_path,
+            ),
+        )
+
+        processes.append(safe_commit_process)
+        safe_commit_process.start()
+
+    for process in processes:
+        process.join()
+
+    print(f"Total file in projects folder: {len(file_list)}")
+    print(f"Total crawled safe rust files: {len(safe_shared_list)}")
+    print(f"Total failed rust files: {len(failed_url_list)}")
+
+    with open(os.path.join(our_dir, "target.0.json"), "w") as json_file:
+        json.dump(list(safe_shared_list), json_file, indent=2)
+    with open(os.path.join(our_dir, "failed.0.json"), "w") as json_file:
+        json.dump(list(failed_url_list), json_file, indent=2)
 
 
 def get_bug_dataset(code_dir: str, outfile: str):
@@ -485,8 +610,15 @@ def get_safe_rust_files(percent: float):
             continue
 
         with open(filepath) as f:
-            loc = len(f.readlines())
+            try:
+                loc = len(f.readlines())
+            except Exception as e:
+                print(f"Error reading file: {filepath}")
+                print(e)
+                continue
+
             if loc <= 0:
+                print(f"File {filepath} has no line of code")
                 continue
 
             count += 1
@@ -510,6 +642,18 @@ def combile_bug_and_safe_dataset(safe_dataset: str, bug_dataset: str, output_fil
 
 
 if __name__ == "__main__":
+    DIRNAME = "target_1_safe_random_2"
+    os.makedirs(DIRNAME, exist_ok=True)
+    get_target_1_dataset(DIRNAME)
+    get_safe_random_dataset(DIRNAME, 0.06)
+
+    data = [
+        *json.load(open(os.path.join(DIRNAME, "target.0.json"))),
+        *json.load(open(os.path.join(DIRNAME, "target.1.json"))),
+    ]
+    random.shuffle(data)
+    json.dump(data, open(os.path.join(DIRNAME, "dataset.rust.json"), "w"), indent=2)
+
     # count_line("downloads.python.100")
     # count_line("joern.ffmpeg")
 

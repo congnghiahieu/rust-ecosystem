@@ -9,4 +9,4 @@ __pycache__
 .csv
 advisory-db-osv
 downloads*
-safe.rust.2
+safe.rust.*
